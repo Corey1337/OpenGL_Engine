@@ -23,6 +23,14 @@ struct Vector3
         this->z = z;
     }
 
+    inline float& operator[](int index){
+        return *(&x + index);
+    }
+
+    inline const float& operator[](int index)const{
+        return *(&x + index);
+    }
+
     Vector3& operator=(Vector3 right){
         x = right.x;
         y = right.y;
@@ -46,51 +54,51 @@ struct Vector3
 
 };
 
-bool operator==(Vector3 v1, Vector3 v2){
+inline bool operator==(Vector3 v1, Vector3 v2){
     return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
 }
 
-bool operator!=(Vector3 v1, Vector3 v2){
+inline bool operator!=(Vector3 v1, Vector3 v2){
     return !operator==(v1, v2);
 }
 
-Vector3 operator+(Vector3 v1, Vector3 v2){
+inline Vector3 operator+(Vector3 v1, Vector3 v2){
     return Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 }
 
-Vector3 operator-(Vector3 v1, Vector3 v2){
+inline Vector3 operator-(Vector3 v1, Vector3 v2){
     return Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 }
 
-Vector3 operator-(Vector3 v){
+inline Vector3 operator-(Vector3 v){
     return Vector3(v.x * -1, v.y * -1, v.z * -1);
 }
 
-Vector3 operator*(Vector3 v1, Vector3 v2){
+inline Vector3 operator*(Vector3 v1, Vector3 v2){
     return Vector3(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
 }
 
-Vector3 operator*(Vector3 v, float f){
+inline Vector3 operator*(Vector3 v, float f){
     return Vector3(v.x * f, v.y * f, v.z * f);
 }
 
-Vector3 operator*(float f, Vector3 v){
+inline Vector3 operator*(float f, Vector3 v){
     return operator*(v, f);
 }
 
-Vector3 operator/(Vector3 v, float f){
+inline Vector3 operator/(Vector3 v, float f){
     return Vector3(v.x / f, v.y / f, v.z / f);
 }
 
-float dot(Vector3 v1, Vector3 v2){
+inline float dot_product(Vector3 v1, Vector3 v2){
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
-float lenth(Vector3 v){
+inline float lenth(Vector3 v){
     return sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2));
 }
 
-Vector3 cross(Vector3 v1, Vector3 v2){
+inline Vector3 cross_product(Vector3 v1, Vector3 v2){
     Vector3 out;
     out.x = v1.y * v2.z - v1.z * v2.y;
     out.y = v1.z * v2.x - v1.x * v2.z;
@@ -99,10 +107,14 @@ Vector3 cross(Vector3 v1, Vector3 v2){
     return out;
 }
 
-Vector3 normalize(Vector3 v){
+inline Vector3 normalize(Vector3 v){
     return v / lenth(v);
 }
 
-Vector3 reverse(Vector3 v){
+inline Vector3 reverse(Vector3 v){
     return operator-(v);
+}
+
+inline Vector3 distance(Vector3 v1, Vector3 v2){
+    return lenth(v2-v1);
 }

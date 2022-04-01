@@ -25,6 +25,14 @@ struct Vector4
         this->z = z;
         this->w = w;
     }
+    
+    inline float& operator[](int index){
+        return *(&x + index);
+    }
+
+    inline const float& operator[](int index)const{
+        return *(&x + index);
+    }
 
     Vector4& operator=(Vector4 right){
         x = right.x;
@@ -88,7 +96,7 @@ Vector4 operator/(Vector4 v, float f){
     return Vector4(v.x / f, v.y / f, v.z / f, v.w / f);
 }
 
-float dot(Vector4 v1, Vector4 v2){
+float dot_product(Vector4 v1, Vector4 v2){
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
 }
 
@@ -102,4 +110,8 @@ Vector4 normalize(Vector4 v){
 
 Vector4 reverse(Vector4 v){
     return operator-(v);
+}
+
+Vector4 distance(Vector4 v1, Vector4 v2){
+    return lenth(v2-v1);
 }
