@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe сборка активного файла",
+            "command": "D:\\msys64\\mingw64\\bin\\g++.exe",
+            "args": [
+                //compiller:
+                "-fdiagnostics-color=always",
+                "-g",
+                //"${file}",
+                //"${workspaceFolder}\\src\\**",
+                "${workspaceFolder}\\src\\main.cpp",
+                //"${workspaceFolder}\\src\\pp\\test.cpp",
+                "${workspaceFolder}\\libs\\utils\\shaderLoader.cpp",
+                //"${workspaceFolder}\\libs\\glm\\**",
+                "-I${workspaceFolder}\\libs",
+                "-ID:\\libs\\c++ libs\\sfml gcc\\include",
+                "-ID:\\libs\\c++ libs\\glew 2.1.0\\include",
+
+                //linker:
+                "-o",
+                "${workspaceFolder}\\main.exe",
+
+                "-LD:\\libs\\c++ libs\\sfml gcc\\lib",
+                //"-lsfml-main",
+                "-lsfml-graphics",
+                "-lsfml-window",
+                "-lsfml-system",
+                "-lopengl32",
+
+                "-LD:\\libs\\c++ libs\\glew 2.1.0\\lib",
+                "-lglew32"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "компилятор: D:\\msys64\\mingw64\\bin\\g++.exe"
+        }
+    ]
+}
