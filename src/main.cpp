@@ -3,11 +3,23 @@
 #include <SFML/Window.hpp>
 #include "utils/shaderLoader.h"
 #include "glm/vec2.hpp"
-#include "math/vec2.hpp"
+#include "math/math.hpp"
+#include "glm/mat3x3.hpp"
+#include "stb/stb_image.h"
 
 using namespace std;
 
 int main() {
+
+	
+	// Mat4 a({
+	// 	{2, 3, 4, 1},
+	// 	{4, 5, 6, 1},
+	// 	{4, 5, 7, 1},
+	// 	{4, 5, 7, 3},
+	// });
+
+	// auto c = inverse(a);
 
 	sf::ContextSettings settings;
 	settings.depthBits = 24; // количество битов буффера глубины
@@ -26,21 +38,64 @@ int main() {
 		return -1;
 	}
 
-	bool isGo = true;
-
     auto shaderProgram = LoadShaders(".\\res\\shaders\\shader.vs", ".\\res\\shaders\\shader.fs");
 
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 0.1f, //лн
-        -0.5f, 0.5f, 0.0f,  0.0f, 1.0f, 0.0f, //лв
-        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 1.0f, //пн
-        0.5f, 0.5f, 0.0f,  1.0f, 0.0f, 1.0f //пв
-    };
+    // float vertices[] = {
+    //     -0.5f, -0.5f, 0.0f,  0.0, 0.0, //лн
+    //     -0.5f, 0.5f, 0.0f,  0.0f, 1.0f, //лв
+    //     0.5f, 0.5f, 0.0f,  1.0f, 1.0f,//пв
+    //     0.5f, -0.5f, 0.0f,  1.0f, 0.0f//пн квадрат
+    // };
 
-    unsigned int indices[] = { //вершины квадрата соединяем
-        0, 1, 2, //первый треуг
-        1, 2, 3 //второй треуг
-    };
+    // unsigned int indices[] = { //вершины квадрата соединяем
+    //     0, 1, 3, //первый треуг
+    //     1, 2, 3 //второй треуг
+    // };
+
+	float vertices [] = {
+		// координаты        // текстурные координаты
+	   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+	   -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+	   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	   -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	   -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+	   -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+	   -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+	   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+	   -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+	   -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO); //сгенерили id для массивов вершин (1 шт)
@@ -50,19 +105,40 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO); //связали буфер с opengl
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //прокинули массив в opengl
 
-    glGenBuffers(1, &EBO); 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); 
+    //glGenBuffers(1, &EBO); 
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); 
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0); // прописали параметры для объекта
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)0); // прописали параметры для объекта
     glEnableVertexAttribArray(0); //layout y позиции 0
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float))); // прописали параметры для объекта
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), (void*)(3 * sizeof(float))); // прописали параметры для объекта
     glEnableVertexAttribArray(1); //цвет
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0); //снять бинд с массивов
 
+	stbi_set_flip_vertically_on_load(true);
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load(".\\res\\img\\aska.jpg", &width, &height, &nrChannels, 0);
+	if(data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else{
+		cout << "Cant load img" << endl;
+	}
+
+	stbi_image_free(data);
+
+	bool isGo = true;
 
 	while (isGo) {
 		sf::Event windowEvent;
@@ -83,11 +159,14 @@ int main() {
 
         glUseProgram(shaderProgram); //прокидываем шейдерную прогу
         glBindVertexArray(VAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 		//...
-
 		window.display();
 	}
 

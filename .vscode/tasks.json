@@ -9,12 +9,8 @@
                 //compiller:
                 "-fdiagnostics-color=always",
                 "-g",
-                //"${file}",
-                //"${workspaceFolder}\\src\\**",
                 "${workspaceFolder}\\src\\main.cpp",
-                //"${workspaceFolder}\\src\\pp\\test.cpp",
                 "${workspaceFolder}\\libs\\utils\\shaderLoader.cpp",
-                //"${workspaceFolder}\\libs\\glm\\**",
                 "-I${workspaceFolder}\\libs",
                 "-ID:\\libs\\c++ libs\\sfml gcc\\include",
                 "-ID:\\libs\\c++ libs\\glew 2.1.0\\include",
