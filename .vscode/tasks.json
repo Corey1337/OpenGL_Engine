@@ -10,8 +10,10 @@
                 "-fdiagnostics-color=always",
                 "-g",
                 "${workspaceFolder}\\src\\main.cpp",
+                "${workspaceFolder}\\src\\render\\loader.cpp",
                 "${workspaceFolder}\\libs\\utils\\shaderLoader.cpp",
                 "-I${workspaceFolder}\\libs",
+                "-I${workspaceFolder}\\src",
                 "-ID:\\libs\\c++ libs\\sfml gcc\\include",
                 "-ID:\\libs\\c++ libs\\glew 2.1.0\\include",
 

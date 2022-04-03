@@ -1,3 +1,5 @@
+#pragma once
+
 #include "mat.hpp"
 #include "vec.hpp"
 
@@ -6,6 +8,9 @@ using Mat3 = Matrix<3, 3>;
 using Mat4 = Matrix<4, 4>;
 
 
+inline float radians(float degree){
+    return M_PI * degree / 180.0f;
+}
 
 inline float dot_product(Vector2 v1, Vector2 v2){
     return v1.x * v2.x + v1.y * v2.y;
@@ -297,13 +302,13 @@ inline Mat4 CraeteModelMatrix(Mat4 translation_Matrix, Mat4 rotation_Matrix, Mat
 
 inline Mat4 CreateViewMatrix(Vector3 from, Vector3 to, Vector3 worldUp){
     Vector3 forward = normalize(to - from);
-    Vector3 right = cross_product(forward, worldUp);
-    Vector3 up = cross_product(right, forward);
+    Vector3 right = normalize(cross_product(forward, worldUp));
+    Vector3 up = normalize(cross_product(right, forward));
     Mat4 view = {
-        {right.x, up.x, forward.x, 0},
-        {right.y, up.y, forward.y, 0},
-        {right.z, up.z, forward.z, 0},
-        {-dot_product(right, from), -dot_product(up, from), -dot_product(forward, from), 1}
+        {right.x, up.x, -forward.x, 0},
+        {right.y, up.y, -forward.y, 0},
+        {right.z, up.z, -forward.z, 0},
+        {-dot_product(right, from), -dot_product(up, from), dot_product(forward, from), 1}
     };
     return view;
 }
@@ -325,8 +330,8 @@ inline Mat4 perspective(float fov, float aspect, float near, float far){
     float tfov = tanf(fov/2);
     perspect[0][0] = 1/(tfov * aspect);
     perspect[1][1] = 1/tfov;
-    perspect[2][2] = (far + near)/(far-near);
-    perspect[2][3] = 1;
+    perspect[2][2] = -(far + near)/(far-near);
+    perspect[2][3] = -1;
     perspect[3][2] = -2*far*near/(far - near);
     return perspect;
 }

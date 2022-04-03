@@ -1,11 +1,15 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <SFML/Window.hpp>
-#include "utils/shaderLoader.h"
-#include "glm/vec2.hpp"
 #include "math/math.hpp"
-#include "glm/mat3x3.hpp"
+#include "render/loader.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "stb/stb_image.h"
+
+#include "utils/shaderLoader.h"
+
 
 using namespace std;
 
@@ -29,7 +33,7 @@ int main() {
 	settings.attributeFlags = sf::ContextSettings::Core;
 
 	sf::Window window(sf::VideoMode(800, 600, 32), "First Window",
-		sf::Style::Titlebar | sf::Style::Close);
+		sf::Style::Titlebar | sf::Style::Close, settings);
 
 	glewExperimental = GL_TRUE; // включить все современные функции ogl
 
@@ -38,7 +42,11 @@ int main() {
 		return -1;
 	}
 
-    auto shaderProgram = LoadShaders(".\\res\\shaders\\shader.vs", ".\\res\\shaders\\shader.fs");
+	glEnable(GL_DEPTH_TEST);
+
+    auto shaderProgram = ShaderLoader::getInstance().load(".\\res\\shaders\\shader");
+	//auto abc = LoadShaders(".\\res\\shaders\\shader.vs", ".\\res\\shaders\\shader.fs");
+	//cout << abc << endl << shaderProgram->id.id;
 
     // float vertices[] = {
     //     -0.5f, -0.5f, 0.0f,  0.0, 0.0, //лн
@@ -155,12 +163,55 @@ int main() {
 		}
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //отчистка экрана
-		glClear(GL_COLOR_BUFFER_BIT); //отчистка экрана
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //отчистка экрана
 
-        glUseProgram(shaderProgram); //прокидываем шейдерную прогу
+        shaderProgram.bind(); //прокидываем шейдерную прогу
+		//glUseProgram(abc);
+
         glBindVertexArray(VAO);
 
 		glBindTexture(GL_TEXTURE_2D, texture);
+
+		Mat4 model({
+			{1,0,0,0},
+			{0,1,0,0},
+			{0,0,1,0},
+			{0,0,0,1}
+		});
+
+		Mat4 view = CreateViewMatrix(Vector3(5.0f, 5.0f, 5.0f), Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+		Mat4 proj = perspective(radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
+
+		// glUniformMatrix4fv(glGetUniformLocation(abc, "model"), 1, GL_FALSE, &model[0][0]);
+		// glUniformMatrix4fv(glGetUniformLocation(abc, "view"), 1, GL_FALSE, &view[0][0]);
+		// glUniformMatrix4fv(glGetUniformLocation(abc, "projection"), 1, GL_FALSE, &proj[0][0]);
+
+		shaderProgram.setUniformMat4("model", model);
+		shaderProgram.setUniformMat4("view", view);
+		shaderProgram.setUniformMat4("projection", proj);
+
+		//auto model_ = glm::mat4(1.0f);
+		//auto view_ = glm::lookAt(glm::vec3(5.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		//auto proj_ = glm::perspective(glm::radians(45.0f), 800.0f/600.0f, 0.1f, 100.0f);
+
+		// for (int i = 0; i < 4; i++)
+		// {
+		// 	for (int j = 0; j < 4; j++)
+		// 	{
+		// 		cout << view[i][j] << " ";
+		// 	}
+		// 	cout << endl;
+		// }
+		// for (int i = 0; i < 4; i++)
+		// {
+		// 	for (int j = 0; j < 4; j++)
+		// 	{
+		// 		cout << view_[i][j] << " ";
+		// 	}
+		// 	cout << endl;
+		// }
+
+
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
