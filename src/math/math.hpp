@@ -1,91 +1,103 @@
-#define _USE_MATH_DEFINES
+#include "mat.hpp"
+#include "vec.hpp"
 
-#include <vector>
-#include <cmath>
-#include <array>
-#include <ostream>
+using Mat2 = Matrix<2, 2>;
+using Mat3 = Matrix<3, 3>;
+using Mat4 = Matrix<4, 4>;
 
 
-template <int M, int N>
-struct Matrix
-{
-    private:
-        std::array<std::array<float, N>, M> data;
-    public:
-        Matrix() {
-            for(int i = 0; i < M; i++)
-                for (int j = 0; j < N; j++)
-                    data[i][j] = 0;
-        }
-        Matrix(float f) {
-            for(int i = 0; i < M; i++)
-                for (int j = 0; j < N; j++)
-                    data[i][j] = f;
-        }
 
-        inline std::array<float, N>& operator[](const int index) {
-             return data[index]; 
-        }
-
-		inline const std::array<float, N>& operator[](const int index) const { 
-            return data[index];
-        }
-
-        Matrix(std::initializer_list<std::initializer_list<float>> init) {
-			if (init.size() != M) {
-				throw std::invalid_argument("Matrix dimension must be the same");;
-			}
-            
-			for (int i = 0; i < M; i++) {
-				if ((init.begin() + i)->size() != N)
-					throw;
-
-				for (int j = 0; j < N; j++)
-					data[i][j] = *((init.begin() + i)->begin() + j);
-			}
-		}
-};
-
-template<int M, int N>
-inline Matrix<M, N> operator+(Matrix<M, N> m1, Matrix<M, N> m2) {
-		Matrix<M, N> out;
-		for (int i = 0; i < M; i++)
-			for (int j = 0; j < N; j++)
-				out[i][j] = m1[i][j] + m2[i][j];
-		return out;
+inline float dot_product(Vector2 v1, Vector2 v2){
+    return v1.x * v2.x + v1.y * v2.y;
 }
 
-template<int M, int N>
-inline Matrix<M, N> operator-(Matrix<M, N> m1, Matrix<M, N> m2) {
-		Matrix<M, N> out;
-		for (int i = 0; i < M; i++)
-			for (int j = 0; j < N; j++)
-				out[i][j] = m1[i][j] - m2[i][j];
-		return out;
+inline float lenth(Vector2 v){
+    return sqrt(pow(v.x, 2) + pow(v.y, 2));
 }
 
-template<int M, int N>
-inline Matrix<M, N> operator*(Matrix<M, N> m1, float f) {
-		Matrix<M, N> out;
-		for (int i = 0; i < M; i++)
-			for (int j = 0; j < N; j++)
-				out[i][j] = m1[i][j] * f;
-		return out;
+inline Vector2 normalize(Vector2 v){
+    return v / lenth(v);
 }
 
-template<int M, int N>
-inline Matrix<M, N> operator*(float f, Matrix<M, N> m1) {
-		return operator*(m1, f);
+inline Vector2 reverse(Vector2 v){
+    return operator-(v);
 }
 
-template<int M>
-inline Matrix<M, M> operator*(Matrix<M, M> m1, Matrix<M, M> m2) {
-		Matrix<M, M> out;
-		for (int i = 0; i < M; i++)
-			for (int j = 0; j < M; j++)
-				for(int k = 0; k < M; k++)
-                    out[i][j] += m1[i][k] * m2[k][j];
-		return out;
+inline Vector2 distance(Vector2 v1, Vector2 v2){
+    return lenth(v2-v1);
+}
+
+inline Vector2 operator*(Mat2 m, Vector2 v) {
+    Vector2 out;
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            out[j] += m[i][j] * v[j];
+    return out;
+}
+
+inline float dot_product(Vector3 v1, Vector3 v2){
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+inline float lenth(Vector3 v){
+    return sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2));
+}
+
+inline Vector3 cross_product(Vector3 v1, Vector3 v2){
+    Vector3 out;
+    out.x = v1.y * v2.z - v1.z * v2.y;
+    out.y = v1.z * v2.x - v1.x * v2.z;
+    out.z = v1.x * v2.y - v1.y * v2.x;
+
+    return out;
+}
+
+inline Vector3 normalize(Vector3 v){
+    return v / lenth(v);
+}
+
+inline Vector3 reverse(Vector3 v){
+    return operator-(v);
+}
+
+inline Vector3 distance(Vector3 v1, Vector3 v2){
+    return lenth(v2-v1);
+}
+
+inline Vector3 operator*(Mat3 m, Vector3 v) {
+    Vector3 out;
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            out[j] += m[i][j] * v[j];
+    return out;
+}
+
+inline float dot_product(Vector4 v1, Vector4 v2){
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
+}
+
+inline float lenth(Vector4 v){
+    return sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2) + pow(v.w, 2));
+}
+
+inline Vector4 normalize(Vector4 v){
+    return v / lenth(v);
+}
+
+inline Vector4 reverse(Vector4 v){
+    return operator-(v);
+}
+
+inline Vector4 distance(Vector4 v1, Vector4 v2){
+    return lenth(v2-v1);
+}
+
+inline Vector4 operator*(Mat4 m, Vector4 v) {
+    Vector4 out;
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            out[j] += m[i][j] * v[j];
+    return out;
 }
 
 template<int M, int N>
@@ -97,25 +109,12 @@ inline Matrix<M, N> transpose(Matrix<M, N> m) {
     return out;
 }
 
-using Mat2 = Matrix<2, 2>;
-using Mat3 = Matrix<3, 3>;
-using Mat4 = Matrix<4, 4>;
-
 inline float det(Mat2 m) {
     return (m[0][0]*m[1][1]
             -m[0][1]*m[1][0]);
 }
 
 inline float det(Mat3 m) {
-    return (m[0][0]*m[1][1]*m[2][2] 
-            + m[0][1]*m[1][2]*m[2][0] 
-            + m[0][2]*m[1][0]*m[2][1] 
-            - m[0][2]*m[1][1]*m[2][0]
-            - m[0][0]*m[1][2]*m[2][1] 
-            - m[0][1]*m[1][0]*m[2][2]);
-}
-
-inline float det(Mat4 m) {
     return (m[0][0]*m[1][1]*m[2][2] 
             + m[0][1]*m[1][2]*m[2][0] 
             + m[0][2]*m[1][0]*m[2][1] 
@@ -210,362 +209,124 @@ inline Matrix<M, M> inverse(Matrix<M, M> m) {
         return m;
 }
 
-struct Vector2
-{
-    float x = 0.0;
-    float y = 0.0;
+// inline Mat3 translation(Vector2 v){
+//     Mat3 trans;
+//     trans[0][0] = 1;
+//     trans[1][1] = 1;
+//     trans[2][2] = 1;
+//     trans[0][2] = v.x;
+//     trans[1][2] = v.y;
+//     return trans;
+// }
 
+inline Mat4 translation(Vector3 v){
+    Mat4 trans;
+    trans[0][0] = 1;
+    trans[1][1] = 1;
+    trans[2][2] = 1;
+    trans[3][3] = 1;
+    trans[0][3] = v.x;
+    trans[1][3] = v.y;
+    trans[2][3] = v.z;
 
-    Vector2(){
-
-    }
-
-    Vector2(float f){
-        this->x = f;
-        this->y = f;
-    }
-
-    Vector2(float x, float y){
-        this->x = x;
-        this->y = y;
-    }
-
-    inline float& operator[](int index){
-        return *(&x + index);
-    }
-
-    inline const float& operator[](int index)const{
-        return *(&x + index);
-    }
-
-    inline Vector2& operator=(Vector2 right){
-        x = right.x;
-        y = right.y;
-        return *this;
-    }
-
-    inline Vector2& operator+=(Vector2 right){
-        x += right.x;
-        y += right.y;
-        return *this;
-    }
-
-    inline Vector2& operator-=(Vector2 right){
-        x -= right.x;
-        y -= right.y;
-        return *this;
-    }
-};
-
-inline bool operator==(Vector2 v1, Vector2 v2){
-    return v1.x==v2.x && v1.y==v2.y;
+    return trans;
 }
 
-inline bool operator!=(Vector2 v1, Vector2 v2){
-    return !operator==(v1, v2);
+// inline Mat3 scale(Vector2 v){
+//     Mat3 trans;
+//     trans[0][0] = v.x;
+//     trans[1][1] = v.y;
+//     trans[2][2] = 1;
+//     return trans;
+// }
+
+inline Mat4 scale(Vector3 v){
+    Mat4 trans;
+    trans[0][0] = v.x;
+    trans[1][1] = v.y;
+    trans[2][2] = v.z;
+    trans[3][3] = 1;
+    return trans;
 }
 
-inline Vector2 operator+(Vector2 v1, Vector2 v2){
-    return Vector2(v1.x + v2.x, v1.y + v2.y);
+// inline Mat3 rotate(float angle){
+//     Mat3 rot;
+//     float sin_a = sinf(angle);
+//     float cos_a = cosf(angle);
+//     rot[0][0] = cos_a;
+//     rot[0][1] = sin_a;
+//     rot[1][0] = -sin_a;
+//     rot[1][1] = cos_a;
+// }
+
+inline Mat4 rotate(float a, float b, float g){
+    float sa = sinf(a);
+    float ca = cosf(a);
+    float sb = sinf(b);
+    float cb = cosf(b);
+    float sg = sinf(g);
+    float cg = cosf(g);
+    Mat4 rot = {
+        {ca*cg-sa*cb*sg, -ca*sg-sa*cb+cg, sa*sb, 0},
+        {sa*cg+ca*cb*sg, -sa*sg+ca*cb*cg, -ca*sb, 0},
+        {sb*sg, sb*cg, cb, 0},
+        {0, 0, 0, 1},
+    };
+    return rot;
 }
 
-inline Vector2 operator-(Vector2 v1, Vector2 v2){
-    return Vector2(v1.x - v2.x, v1.y - v2.y);
+inline Mat4 rotate(Vector3 v, float a) {
+		Vector3 R = normalize(v);
+		float c = cosf(a);
+		float s = sinf(a);
+
+		Mat4 rot = {
+		    { c + R.x * R.x * (1 - c), R.x * R.y * (1 - c) - R.z * s, R.x * R.z * (1 - c) + R.y * s, 0 },
+			{ R.y * R.x * (1 - c) + R.z * s, c + R.y * R.y * (1 - c), R.y * R.z * (1 - c) - R.x * s, 0 },
+			{ R.z * R.x * (1 - c) - R.y * s, R.z * R.y * (1 - c) + R.x * s, c + R.z * R.z * (1 - c), 0 },
+			{ 0, 0, 0, 1 }
+		};
+		return rot;
 }
 
-inline Vector2 operator-(Vector2 v){
-    return Vector2(v.x * -1, v.y * -1);
+
+
+inline Mat4 CraeteModelMatrix(Mat4 translation_Matrix, Mat4 rotation_Matrix, Mat4 scale_Matrix){
+    return translation_Matrix*rotation_Matrix*scale_Matrix;
 }
 
-inline Vector2 operator*(Vector2 v1, Vector2 v2){
-    return Vector2(v1.x * v2.x, v1.y * v2.y);
+inline Mat4 CreateViewMatrix(Vector3 from, Vector3 to, Vector3 worldUp){
+    Vector3 forward = normalize(to - from);
+    Vector3 right = cross_product(forward, worldUp);
+    Vector3 up = cross_product(right, forward);
+    Mat4 view = {
+        {right.x, up.x, forward.x, 0},
+        {right.y, up.y, forward.y, 0},
+        {right.z, up.z, forward.z, 0},
+        {-dot_product(right, from), -dot_product(up, from), -dot_product(forward, from), 1}
+    };
+    return view;
 }
 
-inline Vector2 operator*(Vector2 v, float f){
-    return Vector2(v.x * f, v.y * f);
+inline Mat4 ortho(float left, float right, float bottom, float top, float near, float far){
+    Mat4 ort;
+    ort[0][0] = 2/(right - left);
+    ort[1][1] = 2/(top - bottom);
+    ort[1][1] = -2/(far - near);
+    ort[2][2] = 1;
+    ort[0][3] = -(right + left)/(right - left);
+    ort[1][3] = -(top + bottom)/(top - bottom);
+    ort[2][3] = -(far + near)/(far - near);
+    return ort;
 }
 
-inline Vector2 operator*(float f, Vector2 v){
-    return operator*(v, f);
-}
-
-inline Vector2 operator/(Vector2 v, float f){
-    return Vector2(v.x / f, v.y / f);
-}
-
-inline float dot_product(Vector2 v1, Vector2 v2){
-    return v1.x * v2.x + v1.y * v2.y;
-}
-
-inline float lenth(Vector2 v){
-    return sqrt(pow(v.x, 2) + pow(v.y, 2));
-}
-
-inline Vector2 normalize(Vector2 v){
-    return v / lenth(v);
-}
-
-inline Vector2 reverse(Vector2 v){
-    return operator-(v);
-}
-
-inline Vector2 distance(Vector2 v1, Vector2 v2){
-    return lenth(v2-v1);
-}
-
-inline Vector2 operator*(Mat2 m, Vector2 v) {
-    Vector2 out;
-    for (int i = 0; i < 2; i++)
-        for (int j = 0; j < 2; j++)
-            out[j] += m[i][j] * v[j];
-    return out;
-}
-
-struct Vector3
-{
-    float x = 0.0;
-    float y = 0.0;
-    float z = 0.0;
-
-    Vector3(){
-
-    }
-
-    Vector3(float f){
-        this->x = f;
-        this->y = f;
-        this->z = f;
-    }
-
-    Vector3(float x, float y, float z){
-        this->x = x;
-        this->y = y;
-        this->z = z;
-    }
-
-    inline float& operator[](int index){
-        return *(&x + index);
-    }
-
-    inline const float& operator[](int index)const{
-        return *(&x + index);
-    }
-
-    inline Vector3& operator=(Vector3 right){
-        x = right.x;
-        y = right.y;
-        z = right.z;
-        return *this;
-    }
-
-    inline Vector3& operator+=(Vector3 right){
-        x += right.x;
-        y += right.y;
-        z += right.z;
-        return *this;
-    }
-
-    inline Vector3& operator-=(Vector3 right){
-        x -= right.x;
-        y -= right.y;
-        z -= right.z;
-        return *this;
-    }
-
-};
-
-inline bool operator==(Vector3 v1, Vector3 v2){
-    return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
-}
-
-inline bool operator!=(Vector3 v1, Vector3 v2){
-    return !operator==(v1, v2);
-}
-
-inline Vector3 operator+(Vector3 v1, Vector3 v2){
-    return Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
-}
-
-inline Vector3 operator-(Vector3 v1, Vector3 v2){
-    return Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-}
-
-inline Vector3 operator-(Vector3 v){
-    return Vector3(v.x * -1, v.y * -1, v.z * -1);
-}
-
-inline Vector3 operator*(Vector3 v1, Vector3 v2){
-    return Vector3(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z);
-}
-
-inline Vector3 operator*(Vector3 v, float f){
-    return Vector3(v.x * f, v.y * f, v.z * f);
-}
-
-inline Vector3 operator*(float f, Vector3 v){
-    return operator*(v, f);
-}
-
-inline Vector3 operator/(Vector3 v, float f){
-    return Vector3(v.x / f, v.y / f, v.z / f);
-}
-
-inline float dot_product(Vector3 v1, Vector3 v2){
-    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-}
-
-inline float lenth(Vector3 v){
-    return sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2));
-}
-
-inline Vector3 cross_product(Vector3 v1, Vector3 v2){
-    Vector3 out;
-    out.x = v1.y * v2.z - v1.z * v2.y;
-    out.y = v1.z * v2.x - v1.x * v2.z;
-    out.z = v1.x * v2.y - v1.y * v2.x;
-
-    return out;
-}
-
-inline Vector3 normalize(Vector3 v){
-    return v / lenth(v);
-}
-
-inline Vector3 reverse(Vector3 v){
-    return operator-(v);
-}
-
-inline Vector3 distance(Vector3 v1, Vector3 v2){
-    return lenth(v2-v1);
-}
-
-inline Vector3 operator*(Mat3 m, Vector3 v) {
-    Vector3 out;
-    for (int i = 0; i < 3; i++)
-        for (int j = 0; j < 3; j++)
-            out[j] += m[i][j] * v[j];
-    return out;
-}
-
-struct Vector4
-{
-    float x = 0.0;
-    float y = 0.0;
-    float z = 0.0;
-    float w = 0.0;
-
-    Vector4(){
-
-    }
-
-    Vector4(float f){
-        this->x = f;
-        this->y = f;
-        this->z = f;
-        this->w = f;
-    }
-
-    Vector4(float x, float y, float z, float w){
-        this->x = x;
-        this->y = y;
-        this->z = z;
-        this->w = w;
-    }
-    
-    inline float& operator[](int index){
-        return *(&x + index);
-    }
-
-    inline const float& operator[](int index)const{
-        return *(&x + index);
-    }
-
-    inline Vector4& operator=(Vector4 right){
-        x = right.x;
-        y = right.y;
-        z = right.z;
-        w = right.w;
-        return *this;
-    }
-
-    inline Vector4& operator+=(Vector4 right){
-        x += right.x;
-        y += right.y;
-        z += right.z;
-        w += right.w;
-        return *this;
-    }
-
-    inline Vector4& operator-=(Vector4 right){
-        x -= right.x;
-        y -= right.y;
-        w -= right.w;
-        z -= right.z;
-        return *this;
-    }
-
-};
-
-inline bool operator==(Vector4 v1, Vector4 v2){
-    return v1.x==v2.x && v1.y==v2.y && v1.z==v2.z && v1.w==v2.w;
-}
-
-inline bool operator!=(Vector4 v1, Vector4 v2){
-    return !operator==(v1, v2);
-}
-
-inline Vector4 operator+(Vector4 v1, Vector4 v2){
-    return Vector4(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z, v1.w + v2.w);
-}
-
-inline Vector4 operator-(Vector4 v1, Vector4 v2){
-    return Vector4(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z, v1.w - v2.w);
-}
-
-inline Vector4 operator-(Vector4 v){
-    return Vector4(v.x * -1, v.y * -1, v.z * -1, v.w * -1);
-}
-
-inline Vector4 operator*(Vector4 v1, Vector4 v2){
-    return Vector4(v1.x * v2.x, v1.y * v2.y, v1.z * v2.z, v1.w * v2.w);
-}
-
-inline Vector4 operator*(Vector4 v, float f){
-    return Vector4(v.x * f, v.y * f, v.z * f, v.w * f);
-}
-
-inline Vector4 operator*(float f, Vector4 v){
-    return operator*(v, f);
-}
-
-inline Vector4 operator/(Vector4 v, float f){
-    return Vector4(v.x / f, v.y / f, v.z / f, v.w / f);
-}
-
-inline float dot_product(Vector4 v1, Vector4 v2){
-    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
-}
-
-inline float lenth(Vector4 v){
-    return sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2) + pow(v.w, 2));
-}
-
-inline Vector4 normalize(Vector4 v){
-    return v / lenth(v);
-}
-
-inline Vector4 reverse(Vector4 v){
-    return operator-(v);
-}
-
-inline Vector4 distance(Vector4 v1, Vector4 v2){
-    return lenth(v2-v1);
-}
-
-inline Vector4 operator*(Mat4 m, Vector4 v) {
-    Vector4 out;
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            out[j] += m[i][j] * v[j];
-    return out;
+inline Mat4 perspective(float fov, float aspect, float near, float far){
+    Mat4 perspect;
+    float tfov = tanf(fov/2);
+    perspect[0][0] = 1/(tfov * aspect);
+    perspect[1][1] = 1/tfov;
+    perspect[2][2] = (far + near)/(far-near);
+    perspect[2][3] = 1;
+    perspect[3][2] = -2*far*near/(far - near);
+    return perspect;
 }
