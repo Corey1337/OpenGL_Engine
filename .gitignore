@@ -94,6 +94,9 @@ dkms.conf
 .history
 .ionide
 
+###imgui ini file
+imgui.ini
+
 # Support for Project snippet scope
 
 # End of https://www.toptal.com/developers/gitignore/api/c,c++,visualstudiocode

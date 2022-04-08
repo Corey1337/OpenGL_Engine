@@ -52,6 +52,17 @@ struct Vector2
         y -= right.y;
         return *this;
     }
+
+    // TODO:
+    // Vector2(std::initializer_list<float> init) {
+    //     if (init.size() != 2) {
+    //         throw std::invalid_argument("Vector size must be the same");
+    //     }
+            
+    //     for (int i = 0; i < 2; i++) {
+    //         this[i] = *(init.begin() + i);
+    //     }
+    // }
 };
 
 inline bool operator==(Vector2 v1, Vector2 v2){

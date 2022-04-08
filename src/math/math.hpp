@@ -36,7 +36,7 @@ inline Vector2 operator*(Mat2 m, Vector2 v) {
     Vector2 out;
     for (int i = 0; i < 2; i++)
         for (int j = 0; j < 2; j++)
-            out[j] += m[i][j] * v[j];
+            out[i] += m[i][j] * v[j];
     return out;
 }
 
@@ -73,7 +73,7 @@ inline Vector3 operator*(Mat3 m, Vector3 v) {
     Vector3 out;
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
-            out[j] += m[i][j] * v[j];
+            out[i] += m[i][j] * v[j];
     return out;
 }
 
@@ -101,7 +101,16 @@ inline Vector4 operator*(Mat4 m, Vector4 v) {
     Vector4 out;
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
-            out[j] += m[i][j] * v[j];
+            out[i] += m[i][j] * v[j];
+    return out;
+}
+
+template<int M>
+inline Matrix<M, M> identity(Matrix<M, M> m, float f = 1.0f){
+    Matrix<M, M> out;
+    for (int i = 0; i < M; i++){
+        out[i][i] = f;
+    }
     return out;
 }
 
@@ -224,7 +233,7 @@ inline Matrix<M, M> inverse(Matrix<M, M> m) {
 //     return trans;
 // }
 
-inline Mat4 translation(Vector3 v){
+inline Mat4 translationMat(Vector3 v){
     Mat4 trans;
     trans[0][0] = 1;
     trans[1][1] = 1;
@@ -245,13 +254,13 @@ inline Mat4 translation(Vector3 v){
 //     return trans;
 // }
 
-inline Mat4 scale(Vector3 v){
-    Mat4 trans;
-    trans[0][0] = v.x;
-    trans[1][1] = v.y;
-    trans[2][2] = v.z;
-    trans[3][3] = 1;
-    return trans;
+inline Mat4 scaleMat(Vector3 v){
+    Mat4 scale;
+    scale[0][0] = v.x;
+    scale[1][1] = v.y;
+    scale[2][2] = v.z;
+    scale[3][3] = 1;
+    return scale;
 }
 
 // inline Mat3 rotate(float angle){
@@ -264,7 +273,7 @@ inline Mat4 scale(Vector3 v){
 //     rot[1][1] = cos_a;
 // }
 
-inline Mat4 rotate(float a, float b, float g){
+inline Mat4 rotateMat(float a, float b, float g){
     float sa = sinf(a);
     float ca = cosf(a);
     float sb = sinf(b);
@@ -272,15 +281,15 @@ inline Mat4 rotate(float a, float b, float g){
     float sg = sinf(g);
     float cg = cosf(g);
     Mat4 rot = {
-        {ca*cg-sa*cb*sg, -ca*sg-sa*cb+cg, sa*sb, 0},
-        {sa*cg+ca*cb*sg, -sa*sg+ca*cb*cg, -ca*sb, 0},
-        {sb*sg, sb*cg, cb, 0},
-        {0, 0, 0, 1},
+        {ca*cg-sa*cb*sg, -ca*sg-sa*cb+cg, sa*sb, 0.0f},
+        {sa*cg+ca*cb*sg, -sa*sg+ca*cb*cg, -ca*sb, 0.0f},
+        {sb*sg, sb*cg, cb, 0.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f}
     };
     return rot;
 }
 
-inline Mat4 rotate(Vector3 v, float a) {
+inline Mat4 rotateMat(Vector3 v, float a) {
 		Vector3 R = normalize(v);
 		float c = cosf(a);
 		float s = sinf(a);
@@ -294,10 +303,8 @@ inline Mat4 rotate(Vector3 v, float a) {
 		return rot;
 }
 
-
-
 inline Mat4 CraeteModelMatrix(Mat4 translation_Matrix, Mat4 rotation_Matrix, Mat4 scale_Matrix){
-    return translation_Matrix*rotation_Matrix*scale_Matrix;
+    return transpose(translation_Matrix*rotation_Matrix*scale_Matrix);
 }
 
 inline Mat4 CreateViewMatrix(Vector3 from, Vector3 to, Vector3 worldUp){
