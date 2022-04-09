@@ -3,10 +3,11 @@
 #include "mat.hpp"
 #include "vec.hpp"
 
+#define _USE_MATH_DEFINES
+
 using Mat2 = Matrix<2, 2>;
 using Mat3 = Matrix<3, 3>;
 using Mat4 = Matrix<4, 4>;
-
 
 inline float radians(float degree){
     return M_PI * degree / 180.0f;
@@ -16,12 +17,12 @@ inline float dot_product(Vector2 v1, Vector2 v2){
     return v1.x * v2.x + v1.y * v2.y;
 }
 
-inline float lenth(Vector2 v){
-    return sqrt(pow(v.x, 2) + pow(v.y, 2));
+inline float length(Vector2 v){
+    return sqrtf(powf(v.x, 2) + powf(v.y, 2));
 }
 
 inline Vector2 normalize(Vector2 v){
-    return v / lenth(v);
+    return v / length(v);
 }
 
 inline Vector2 reverse(Vector2 v){
@@ -29,7 +30,7 @@ inline Vector2 reverse(Vector2 v){
 }
 
 inline Vector2 distance(Vector2 v1, Vector2 v2){
-    return lenth(v2-v1);
+    return length(v2-v1);
 }
 
 inline Vector2 operator*(Mat2 m, Vector2 v) {
@@ -44,8 +45,8 @@ inline float dot_product(Vector3 v1, Vector3 v2){
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
-inline float lenth(Vector3 v){
-    return sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2));
+inline float length(Vector3 v){
+    return sqrtf(powf(v.x, 2) + powf(v.y, 2) + powf(v.z, 2));
 }
 
 inline Vector3 cross_product(Vector3 v1, Vector3 v2){
@@ -58,7 +59,7 @@ inline Vector3 cross_product(Vector3 v1, Vector3 v2){
 }
 
 inline Vector3 normalize(Vector3 v){
-    return v / lenth(v);
+    return v / length(v);
 }
 
 inline Vector3 reverse(Vector3 v){
@@ -66,7 +67,7 @@ inline Vector3 reverse(Vector3 v){
 }
 
 inline Vector3 distance(Vector3 v1, Vector3 v2){
-    return lenth(v2-v1);
+    return length(v2-v1);
 }
 
 inline Vector3 operator*(Mat3 m, Vector3 v) {
@@ -81,12 +82,12 @@ inline float dot_product(Vector4 v1, Vector4 v2){
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w;
 }
 
-inline float lenth(Vector4 v){
-    return sqrt(pow(v.x, 2) + pow(v.y, 2) + pow(v.z, 2) + pow(v.w, 2));
+inline float length(Vector4 v){
+    return sqrtf(powf(v.x, 2) + powf(v.y, 2) + powf(v.z, 2) + powf(v.w, 2));
 }
 
 inline Vector4 normalize(Vector4 v){
-    return v / lenth(v);
+    return v / length(v);
 }
 
 inline Vector4 reverse(Vector4 v){
@@ -94,7 +95,7 @@ inline Vector4 reverse(Vector4 v){
 }
 
 inline Vector4 distance(Vector4 v1, Vector4 v2){
-    return lenth(v2-v1);
+    return length(v2-v1);
 }
 
 inline Vector4 operator*(Mat4 m, Vector4 v) {
@@ -203,7 +204,7 @@ inline Mat4 inverse(Mat4 m_) {
     Inverse[3][3] = +(m[0][0] * SubFactor14 - m[0][1] * SubFactor16 + m[0][2] * SubFactor17);
 
     float Determinant =
-        +m[0][0] * Inverse[0][0]
+        + m[0][0] * Inverse[0][0]
         + m[0][1] * Inverse[0][1]
         + m[0][2] * Inverse[0][2]
         + m[0][3] * Inverse[0][3];
@@ -243,7 +244,7 @@ inline Mat4 translationMat(Vector3 v){
     trans[1][3] = v.y;
     trans[2][3] = v.z;
 
-    return trans;
+    return transpose(trans);
 }
 
 // inline Mat3 scale(Vector2 v){
@@ -300,11 +301,11 @@ inline Mat4 rotateMat(Vector3 v, float a) {
 			{ R.z * R.x * (1 - c) - R.y * s, R.z * R.y * (1 - c) + R.x * s, c + R.z * R.z * (1 - c), 0 },
 			{ 0, 0, 0, 1 }
 		};
-		return rot;
+		return transpose(rot);
 }
 
 inline Mat4 CraeteModelMatrix(Mat4 translation_Matrix, Mat4 rotation_Matrix, Mat4 scale_Matrix){
-    return transpose(translation_Matrix*rotation_Matrix*scale_Matrix);
+    return translation_Matrix*rotation_Matrix*scale_Matrix;
 }
 
 inline Mat4 CreateViewMatrix(Vector3 from, Vector3 to, Vector3 worldUp){
@@ -324,11 +325,11 @@ inline Mat4 ortho(float left, float right, float bottom, float top, float near, 
     Mat4 ort;
     ort[0][0] = 2/(right - left);
     ort[1][1] = 2/(top - bottom);
-    ort[1][1] = -2/(far - near);
-    ort[2][2] = 1;
-    ort[0][3] = -(right + left)/(right - left);
-    ort[1][3] = -(top + bottom)/(top - bottom);
-    ort[2][3] = -(far + near)/(far - near);
+    ort[2][2] = -2/(far - near);
+    ort[3][0] = -(right + left)/(right - left);
+    ort[3][1] = -(top + bottom)/(top - bottom);
+    ort[3][2] = -(far + near)/(far - near);
+    ort[3][3] = 1;
     return ort;
 }
 

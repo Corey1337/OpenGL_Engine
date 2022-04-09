@@ -7,7 +7,6 @@
 #include <array>
 #include <ostream>
 
-
 template <int M, int N>
 struct Matrix
 {
@@ -86,6 +85,6 @@ inline Matrix<M, M> operator*(Matrix<M, M> m1, Matrix<M, M> m2) {
 		for (int i = 0; i < M; i++)
 			for (int j = 0; j < M; j++)
 				for(int k = 0; k < M; k++)
-                    out[i][j] += m1[i][k] * m2[k][j];
+                    out[j][i] += m1[k][i] * m2[j][k];
 		return out;
 }

@@ -2,97 +2,116 @@
 #include <math/math.hpp>
 #include <GL/glew.h>
 
-template<typename T>
-struct Id {
+template <typename T>
+struct Id
+{
     unsigned id;
 };
 
-class Shader{
-        friend class ShaderLoader;
+class Shader
+{
+    friend class ShaderLoader;
 
-        Id<Shader> id;
-        Shader(){}
-    public:
-        void bind();
-        void unbind();
-        void setUniformMat4(std::string name, Mat4 mat);
+    Id<Shader> id;
+    Shader() {}
+
+public:
+    void bind();
+    void unbind();
+    void setUniformMat4(std::string name, Mat4 mat);
 };
 
-class ShaderLoader{
-    public:
-        ShaderLoader(ShaderLoader&) = delete;
-        ShaderLoader(ShaderLoader&&) = delete;
+class ShaderLoader
+{
+public:
+    ShaderLoader(ShaderLoader &) = delete;
+    ShaderLoader(ShaderLoader &&) = delete;
 
-        static ShaderLoader& getInstance();
-        std::shared_ptr<Shader> load(std::string path);
+    static ShaderLoader &getInstance();
+    std::shared_ptr<Shader> load(std::string path);
 
-    private:
-        ShaderLoader() = default;
-        static std::unique_ptr<ShaderLoader> instance;
-
+private:
+    ShaderLoader() = default;
+    static std::unique_ptr<ShaderLoader> instance;
 };
 
-class Texture{
-        friend class TextureLoader;
+class Texture
+{
+    friend class TextureLoader;
 
-        Id<Texture> id;
-        Texture();
-    public:
-        void bind();
-        void unbind();
+    Id<Texture> id;
+    Texture();
+
+public:
+    void bind();
+    void unbind();
 };
 
-class TextureLoader{
-    public:
-        TextureLoader(TextureLoader&) = delete;
-        TextureLoader(TextureLoader&&) = delete;
+class TextureLoader
+{
+public:
+    TextureLoader(TextureLoader &) = delete;
+    TextureLoader(TextureLoader &&) = delete;
 
-        static TextureLoader& getInstance();
-        std:: shared_ptr<Texture> load(std::string path);
+    static TextureLoader &getInstance();
+    std::shared_ptr<Texture> load(std::string path);
 
-    private:
-        TextureLoader() = default;
-        static std::unique_ptr<TextureLoader> instance;
+private:
+    TextureLoader() = default;
+    static std::unique_ptr<TextureLoader> instance;
 };
 
-struct Vertex {
+struct Vertex
+{
     Vector3 pos;
     Vector2 uv;
 };
 
-class VertexArray {
+class VertexArray
+{
     Id<VertexArray> id;
-    public:
-        VertexArray() {
-            glGenVertexArrays(1, &id.id);
-        }
-        void bind() {
-            glBindVertexArray(id.id);
-        }
-        void unbind() {
-            glBindVertexArray(0);
-        }
+
+public:
+    VertexArray()
+    {
+        glGenVertexArrays(1, &id.id);
+    }
+    void bind()
+    {
+        glBindVertexArray(id.id);
+    }
+    void unbind()
+    {
+        glBindVertexArray(0);
+    }
 };
 
-class VertexBuffer {
+class VertexBuffer
+{
     Id<VertexBuffer> id;
-    public:
-        VertexBuffer() {
-            glGenBuffers(1, &id.id);
-        }
-        void bind(std::vector<Vertex>& data) {
-            glBindBuffer(GL_ARRAY_BUFFER, id.id);
-            glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(Vertex), data.data(), GL_STATIC_DRAW);
-        }
-        void unbind() {
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-        }
-        void bindAttribute(int index, int size, int vertSize, intptr_t offset) {
-            glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, vertSize * sizeof(Vertex), (void*)(intptr_t)offset);
-            glEnableVertexAttribArray(index);
-        }
 
-        void unbindAttribure() {
-            glDisableVertexAttribArray(0);
-        }
+public:
+    VertexBuffer()
+    {
+        glGenBuffers(1, &id.id);
+    }
+    void bind(std::vector<Vertex> &data)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, id.id);
+        glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(Vertex), data.data(), GL_STATIC_DRAW);
+    }
+    void unbind()
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    void bindAttribute(int index, int size, int vertSize, intptr_t offset)
+    {
+        glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, vertSize * sizeof(Vertex), (void *)(intptr_t)offset);
+        glEnableVertexAttribArray(index);
+    }
+
+        void unbindAttribure()
+    {
+        glDisableVertexAttribArray(0);
+    }
 };
