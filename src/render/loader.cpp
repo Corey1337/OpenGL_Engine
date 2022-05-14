@@ -18,6 +18,16 @@ void Shader::setUniformMat4(std::string name, Mat4 mat)
     glUniformMatrix4fv(glGetUniformLocation(id.id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
+void Shader::setUniformVec3(std::string name, Vector3 vec)
+{
+    glUniform3fv(glGetUniformLocation(id.id, name.c_str()), 1, &vec[0]);
+}
+
+void Shader::setUniformFloat(std::string name, float number)
+{
+    glUniform1f(glGetUniformLocation(id.id, name.c_str()), number);
+}
+
 std::unique_ptr<ShaderLoader> ShaderLoader::instance = nullptr;
 
 ShaderLoader &ShaderLoader::getInstance()
@@ -93,3 +103,22 @@ std::shared_ptr<Texture> TextureLoader::load(std::string path)
     texture->unbind();
     return std::shared_ptr<Texture>(texture);
 }
+
+// void Mesh::createBuffers(std::vector<Vertex>& p_vertices, std::vector<uint32_t>& p_indices)
+// {
+//     vertexArray.bind();
+
+//     vertexBuffer = std::make_unique<VertexBuffer>(p_vertices);
+//     indexBuffer = std::make_unique<IndexBuffer>(p_indices);
+
+//     uint32_t vertexSize = sizeof(Vertex);
+//     vertexBuffer->bind();
+//     vertexBuffer->bindAttribute(0, 3, vertexSize, offsetof(Vertex, pos));
+//     vertexBuffer->bindAttribute(1, 2, vertexSize, offsetof(Vertex, uv));
+//     vertexBuffer->bindAttribute(2, 3, vertexSize, offsetof(Vertex, norm));
+
+//     vertexArray->unbind();
+//     vertexBuffer->unbind();
+
+
+// }

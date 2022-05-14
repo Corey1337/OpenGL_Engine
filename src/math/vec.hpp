@@ -7,6 +7,8 @@
 #include <array>
 #include <ostream>
 
+#include "glm/glm.hpp"
+
 struct Vector2
 {
     float x = 0.0;
@@ -57,6 +59,10 @@ struct Vector2
         return *this;
     }
 
+    glm::vec2 ToGLMVec()
+    {
+        return glm::vec2(this->x, this->y);
+    }
     // TODO:
     // Vector2(std::initializer_list<float> init) {
     //     if (init.size() != 2) {
@@ -171,6 +177,11 @@ struct Vector3
         z -= right.z;
         return *this;
     }
+
+    glm::vec3 ToGLMVec()
+    {
+        return glm::vec3(this->x, this->y, this->z);
+    }
 };
 
 inline bool operator==(Vector3 v1, Vector3 v2)
@@ -277,9 +288,13 @@ struct Vector4
     {
         x -= right.x;
         y -= right.y;
-        w -= right.w;
         z -= right.z;
+        w -= right.w;
         return *this;
+    }
+    glm::vec4 ToGLMVec()
+    {
+        return glm::vec4(this->x, this->y, this->z, this->w);
     }
 };
 

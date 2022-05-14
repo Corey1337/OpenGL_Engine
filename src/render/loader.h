@@ -5,7 +5,7 @@
 template <typename T>
 struct Id
 {
-    unsigned id;
+    unsigned id = 0;
 };
 
 class Shader
@@ -19,6 +19,8 @@ public:
     void bind();
     void unbind();
     void setUniformMat4(std::string name, Mat4 mat);
+    void setUniformVec3(std::string name, Vector3 vec);
+    void setUniformFloat(std::string name, float number);
 };
 
 class ShaderLoader
@@ -65,6 +67,7 @@ struct Vertex
 {
     Vector3 pos;
     Vector2 uv;
+    Vector3 norm;
 };
 
 class VertexArray
@@ -106,7 +109,7 @@ public:
     }
     void bindAttribute(int index, int size, int vertSize, intptr_t offset)
     {
-        glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, vertSize * sizeof(Vertex), (void *)(intptr_t)offset);
+        glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, vertSize, (void *)(intptr_t)offset);
         glEnableVertexAttribArray(index);
     }
 
@@ -115,3 +118,23 @@ public:
         glDisableVertexAttribArray(0);
     }
 };
+
+// class Mesh
+// {
+// public:
+//     Mesh(std::vector<Vertex>& vertices, std::vector<unsigned>& indices, unsigned materialIndex):
+//     vectexCount(static_cast<unsigned>(vertices.size())),
+//     indicesCount(static_cast<unsigned>(vertices.size())),
+//     materialIndex(materialIndex),
+//     indices(indices),
+//     vertices(vertices)
+//     {
+//         createBuffers(vertices, indices);
+//     }
+// };
+
+// class Model
+// {
+//     std::vector<Mesh*> meshes;
+//     std::vector<std::string> materialNames;
+// };

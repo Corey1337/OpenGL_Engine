@@ -3,6 +3,8 @@
 #include "mat.hpp"
 #include "vec.hpp"
 
+#include <iostream>
+
 #define _USE_MATH_DEFINES
 
 using Mat2 = Matrix<2, 2>;
@@ -22,7 +24,12 @@ inline float length(Vector2 v){
 }
 
 inline Vector2 normalize(Vector2 v){
-    return v / length(v);
+    float lth = length(v); 
+    if(lth == 0){
+        std::cout << "vector length = 0 cannot be normalized";
+        return Vector2(1.0f);
+    }
+    return v / lth;
 }
 
 inline Vector2 reverse(Vector2 v){
@@ -59,7 +66,12 @@ inline Vector3 cross_product(Vector3 v1, Vector3 v2){
 }
 
 inline Vector3 normalize(Vector3 v){
-    return v / length(v);
+    float lth = length(v); 
+    if(lth == 0){
+        std::cout << "vector length = 0 cannot be normalized";
+        return Vector3(1.0f);
+    }
+    return v / lth;
 }
 
 inline Vector3 reverse(Vector3 v){
@@ -87,7 +99,12 @@ inline float length(Vector4 v){
 }
 
 inline Vector4 normalize(Vector4 v){
-    return v / length(v);
+    float lth = length(v); 
+    if(lth == 0){
+        std::cout << "vector length = 0 cannot be normalized";
+        return Vector4(1.0f);
+    }
+    return v / lth;
 }
 
 inline Vector4 reverse(Vector4 v){
@@ -291,6 +308,8 @@ inline Mat4 rotateMat(float a, float b, float g){
 }
 
 inline Mat4 rotateMat(Vector3 v, float a) {
+        if(length(v) == 0)
+            return identity(Mat4(0));
 		Vector3 R = normalize(v);
 		float c = cosf(a);
 		float s = sinf(a);
