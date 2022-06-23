@@ -13,6 +13,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+#include "utils/assimpParser.h"
+
 using namespace std;
 
 int main()
@@ -95,24 +97,39 @@ int main()
 		Vertex{Vector3(-0.5f, 0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
 	};
 
-	VertexArray VAO;
-	VAO.bind();
+	EModelParserFlags flags = EModelParserFlags::TRIANGULATE;
+	flags |= EModelParserFlags::GEN_SMOOTH_NORMALS;
+	flags |= EModelParserFlags::CALC_TANGENT_SPACE;
+	std::shared_ptr<Model> m0 = std::make_shared<Model>();
+	AssimpParser().LoadModel(".\\res\\models\\pistol_colt\\colt low polyfbx.fbx", m0, flags);
+	// AssimpParser().LoadModel(".\\res\\models\\ussr_furniture\\ussr_low3.fbx", m0, flags);
+	// AssimpParser().LoadModel(".\\res\\models\\axe\\axe_hp.fbx", m0, flags);
 
-	VertexBuffer VBO;
-	VBO.bind(vertices);
+	// VertexArray VAO;
+	// VAO.bind();
+
+	// VertexBuffer VBO;
+	// VBO.bind(vertices);
 
 	// glGenBuffers(1, &EBO);
 	// glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	// glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	VBO.bindAttribute(0, 3, sizeof(Vertex), offsetof(Vertex, pos));
-	VBO.bindAttribute(1, 2, sizeof(Vertex), offsetof(Vertex, uv));
-	VBO.bindAttribute(2, 3, sizeof(Vertex), offsetof(Vertex, norm));
+	// VBO.bindAttribute(0, 3, sizeof(Vertex), offsetof(Vertex, pos));
+	// VBO.bindAttribute(1, 2, sizeof(Vertex), offsetof(Vertex, uv));
+	// VBO.bindAttribute(2, 3, sizeof(Vertex), offsetof(Vertex, norm));
 
-	VAO.unbind();
-	VBO.unbind();
+	// VAO.unbind();
+	// VBO.unbind();
 
-	auto texture = TextureLoader::getInstance().load(".\\res\\img\\aska.jpg");
+	//auto texture = TextureLoader::getInstance().load(".\\res\\imgs\\aska.jpg");
+	auto texture = TextureLoader::getInstance().load(".\\res\\models\\pistol_colt\\colt_low_polyfbx_m1911_BaseColor.png");
+	auto textureNorm = TextureLoader::getInstance().load(".\\res\\models\\pistol_colt\\colt_low_polyfbx_m1911_Normal.png");
+	// auto texture = TextureLoader::getInstance().load(".\\res\\models\\ussr_furniture\\ussr_low3_Material__25_BaseColor.png");
+	// auto textureNorm = TextureLoader::getInstance().load(".\\res\\models\\ussr_furniture\\ussr_low3_Material__25_Normal.png");
+	// auto texture = TextureLoader::getInstance().load(".\\res\\models\\axe\\AXE_vertexcolor.png");
+	// auto textureNorm = TextureLoader::getInstance().load(".\\res\\models\\axe\\AXE_normal.png");
+
 	auto cameraPos = Vector3(3.0f, 3.0f, 3.0f);
 
 	auto lightPos = Vector3(0.0f, 0.0f, 5.0f);
@@ -156,31 +173,31 @@ int main()
 
 		glEnable(GL_DEPTH_TEST);
 
-		texture->bind();
+		texture->bind(0);
+		textureNorm->bind(1);
 
 		shaderProgram->bind();
 
-		VAO.bind();
+		// VAO.bind();
 
 		Mat4 translation = translationMat(translate_vec);
-
 		Mat4 rotation = rotateMat(spin_vec, radians(deg));
+		Mat4 scale = scaleMat(scale_vec);
+		Mat4 model = CraeteModelMatrix(translation, rotation, scale);
+		Mat4 view = CreateViewMatrix(cameraPos, Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+		Mat4 proj = perspective(radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
 		deg += spinSpeed;
 
-		Mat4 scale = scaleMat(scale_vec);
 
-		Mat4 model;
-		model = CraeteModelMatrix(translation, rotation, scale);
-
-		Mat4 view = CreateViewMatrix(cameraPos, Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
-		Mat4 proj = perspective(radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
 		shaderProgram->setUniformVec3("light.ambient", lightAmb);
 		shaderProgram->setUniformVec3("light.diffuse", lightDiff);
 		shaderProgram->setUniformVec3("light.specular", lightSpec);
 		shaderProgram->setUniformVec3("light.position", lightPos);
 
+		shaderProgram->setUniformInt("material.diffuse", 0);
+		shaderProgram->setUniformInt("material.normalMap", 1);
 		shaderProgram->setUniformVec3("material.specular", materialSpec);
 		shaderProgram->setUniformFloat("material.shininess", materialShine);
 
@@ -190,12 +207,26 @@ int main()
 		shaderProgram->setUniformMat4("view", view);
 		shaderProgram->setUniformMat4("projection", proj);
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		for (auto& m : m0->meshes)
+		{
+			m->bind();
 
-		VAO.unbind();
+			glDrawElements(GL_TRIANGLES, m->getIndexCount(), GL_UNSIGNED_INT, 0);
 
-		VBO.unbindAttribure();
+			m->unbind();
+		}
+		// glBindVertexArray(0);
+		// glDisableVertexArrayAttrib(0);
+		// glUseProgram(0);
+
+		// glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		// VAO.unbind();
+
+		// VBO.unbindAttribure();
+
 		texture->unbind();
+
 		shaderProgram->unbind();
 
 		ImGui::SFML::Update(window, deltaClock.restart());

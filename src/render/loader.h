@@ -1,3 +1,5 @@
+#pragma once
+
 #include <memory>
 #include <math/math.hpp>
 #include <GL/glew.h>
@@ -21,6 +23,7 @@ public:
     void setUniformMat4(std::string name, Mat4 mat);
     void setUniformVec3(std::string name, Vector3 vec);
     void setUniformFloat(std::string name, float number);
+    void setUniformInt(std::string name, int number);
 };
 
 class ShaderLoader
@@ -45,7 +48,7 @@ class Texture
     Texture();
 
 public:
-    void bind();
+    void bind(int texSlot);
     void unbind();
 };
 
@@ -68,6 +71,8 @@ struct Vertex
     Vector3 pos;
     Vector2 uv;
     Vector3 norm;
+    Vector3 tangent;
+    Vector3 bitangent;
 };
 
 class VertexArray
@@ -119,22 +124,103 @@ public:
     }
 };
 
-// class Mesh
-// {
-// public:
-//     Mesh(std::vector<Vertex>& vertices, std::vector<unsigned>& indices, unsigned materialIndex):
-//     vectexCount(static_cast<unsigned>(vertices.size())),
-//     indicesCount(static_cast<unsigned>(vertices.size())),
-//     materialIndex(materialIndex),
-//     indices(indices),
-//     vertices(vertices)
-//     {
-//         createBuffers(vertices, indices);
-//     }
-// };
+class IndexBuffer {
+    Id<IndexBuffer> id;
 
-// class Model
-// {
-//     std::vector<Mesh*> meshes;
-//     std::vector<std::string> materialNames;
-// };
+public:
+    enum class UsageType : uint8_t{
+        STREAM_DRAW,
+        STREAM_READ,
+        STREAM_COPY,
+        STATIC_DRAW,
+        STATIC_READ,
+        STATIC_COPY,
+        DYNAMIC_DRAW,
+        DYNAMIC_READ,
+        DYNAMIC_COPY,
+    };
+    std::vector<GLenum> UsageTypeToEnum = {
+        GL_STREAM_DRAW,
+        GL_STREAM_READ,
+        GL_STREAM_COPY,
+        GL_STATIC_DRAW,
+        GL_STATIC_READ,
+        GL_STATIC_COPY,
+        GL_DYNAMIC_DRAW,
+        GL_DYNAMIC_READ,
+        GL_DYNAMIC_COPY,
+    };
+
+    IndexBuffer()
+    {
+        glGenBuffers(1, &id.id);
+    }
+    void bind(std::vector<unsigned> &data)
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id.id);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(unsigned), data.data(), GL_STATIC_DRAW);
+    }
+    void unbind()
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+};
+
+class Mesh
+{
+public:
+    Mesh(std::vector<Vertex>& vertices, std::vector<unsigned>& indices, unsigned materialIndex):
+    vertexCount(static_cast<unsigned>(vertices.size())),
+    indicesCount(static_cast<unsigned>(vertices.size())),
+    materialIndex(materialIndex),
+    indices(indices),
+    vertices(vertices)
+    {
+        createBuffers(vertices, indices);
+    }
+    std::vector<Vertex> vertices;
+    std::vector<unsigned> indices;
+    ~Mesh() = default;
+
+    virtual void bind() {
+        vertexArray.bind();
+    }
+
+    virtual void unbind() {
+        vertexArray.unbind();
+    }
+
+    virtual unsigned getVertexCount() {
+        return vertexCount;
+    }
+
+    virtual unsigned getIndexCount() {
+        return indicesCount;
+    }
+
+    uint32_t getMaterialIndex() const {
+        return materialIndex;
+    }
+
+private:
+    void createBuffers(std::vector<Vertex>& p_vertices, std::vector<unsigned>& p_indices);
+
+public:
+    const unsigned int vertexCount;
+    const unsigned int indicesCount;
+    const unsigned int materialIndex;
+
+    VertexArray vertexArray;
+    // VertexBuffer vertexBuffer;
+    // IndexBuffer indexBuffer;
+    std::unique_ptr<VertexBuffer> vertexBuffer;
+    std::unique_ptr<IndexBuffer> indexBuffer;
+};
+
+class Model
+{
+public:
+    std::vector<Mesh*> meshes;
+    std::vector<std::string> materialNames;
+};

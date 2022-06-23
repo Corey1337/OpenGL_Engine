@@ -13,6 +13,7 @@
                 "${workspaceFolder}\\src\\main.cpp",
                 "${workspaceFolder}\\src\\render\\loader.cpp",
                 "${workspaceFolder}\\libs\\utils\\shaderLoader.cpp",
+                "${workspaceFolder}\\libs\\utils\\assimpParser.cpp",
                 "D:\\libs\\c++ libs\\imgui\\**.cpp",
 
                 "-I${workspaceFolder}\\libs",
@@ -20,6 +21,7 @@
                 "-ID:\\libs\\c++ libs\\sfml gcc\\include",
                 "-ID:\\libs\\c++ libs\\glew 2.1.0\\include",
                 "-ID:\\libs\\c++ libs\\imgui",
+                "-ID:\\libs\\c++ libs\\assimplib\\include",
 
                 //linker:
                 "-o",
@@ -33,7 +35,10 @@
                 "-lopengl32",
 
                 "-LD:\\libs\\c++ libs\\glew 2.1.0\\lib",
-                "-lglew32"
+                "-lglew32",
+
+                "-LD:\\libs\\c++ libs\\assimplib\\lib",
+                "-lassimp",
             ],
             "options": {
                 "cwd": "${fileDirname}"

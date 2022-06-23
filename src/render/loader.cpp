@@ -28,6 +28,11 @@ void Shader::setUniformFloat(std::string name, float number)
     glUniform1f(glGetUniformLocation(id.id, name.c_str()), number);
 }
 
+void Shader::setUniformInt(std::string name, int number)
+{
+    glUniform1i(glGetUniformLocation(id.id, name.c_str()), number);
+}
+
 std::unique_ptr<ShaderLoader> ShaderLoader::instance = nullptr;
 
 ShaderLoader &ShaderLoader::getInstance()
@@ -58,8 +63,9 @@ Texture::Texture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-void Texture::bind()
+void Texture::bind(int texSlot)
 {
+    glActiveTexture(GL_TEXTURE0 + texSlot);
     glBindTexture(GL_TEXTURE_2D, id.id);
 }
 
@@ -85,7 +91,7 @@ std::shared_ptr<Texture> TextureLoader::load(std::string path)
     stbi_set_flip_vertically_on_load(true);
 
     const auto texture = new Texture();
-    texture->bind();
+    texture->bind(0);
     int width, height, nrChannels;
 
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
@@ -104,21 +110,25 @@ std::shared_ptr<Texture> TextureLoader::load(std::string path)
     return std::shared_ptr<Texture>(texture);
 }
 
-// void Mesh::createBuffers(std::vector<Vertex>& p_vertices, std::vector<uint32_t>& p_indices)
-// {
-//     vertexArray.bind();
+void Mesh::createBuffers(std::vector<Vertex>& p_vertices, std::vector<unsigned>& p_indices)
+{
+    vertexArray.bind();
 
-//     vertexBuffer = std::make_unique<VertexBuffer>(p_vertices);
-//     indexBuffer = std::make_unique<IndexBuffer>(p_indices);
+    vertexBuffer = std::make_unique<VertexBuffer>();
+    indexBuffer = std::make_unique<IndexBuffer>();
 
-//     uint32_t vertexSize = sizeof(Vertex);
-//     vertexBuffer->bind();
-//     vertexBuffer->bindAttribute(0, 3, vertexSize, offsetof(Vertex, pos));
-//     vertexBuffer->bindAttribute(1, 2, vertexSize, offsetof(Vertex, uv));
-//     vertexBuffer->bindAttribute(2, 3, vertexSize, offsetof(Vertex, norm));
+    uint32_t vertexSize = sizeof(Vertex);
 
-//     vertexArray->unbind();
-//     vertexBuffer->unbind();
+    vertexBuffer->bind(p_vertices);
+    indexBuffer->bind(p_indices);
 
+    vertexBuffer->bindAttribute(0, 3, vertexSize, offsetof(Vertex, pos));
+    vertexBuffer->bindAttribute(1, 2, vertexSize, offsetof(Vertex, uv));
+    vertexBuffer->bindAttribute(2, 3, vertexSize, offsetof(Vertex, norm));
+    vertexBuffer->bindAttribute(3, 3, vertexSize, offsetof(Vertex, tangent));
+    vertexBuffer->bindAttribute(4, 3, vertexSize, offsetof(Vertex, bitangent));
 
-// }
+    vertexArray.unbind();
+    vertexBuffer->unbind();
+    vertexBuffer->unbindAttribure();
+}

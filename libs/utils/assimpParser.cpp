@@ -1,5 +1,11 @@
+#include "assimpParser.h"
 
-bool AssimpParser::LoadModel(const std::string& fileName, std::vector<Mesh*>& meshes, std::vector<std::string>& materials, EModelParserFlags flags) {
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/matrix4x4.h>
+#include <assimp/postprocess.h>
+
+bool AssimpParser::LoadModel(const std::string& fileName, std::shared_ptr<Model> model, EModelParserFlags flags) {
 	
 	Assimp::Importer import;
 	const auto scene = import.ReadFile(fileName, static_cast<unsigned int>(flags));
@@ -8,11 +14,11 @@ bool AssimpParser::LoadModel(const std::string& fileName, std::vector<Mesh*>& me
 		return false;
 	}
 
-	ProcessMaterials(scene, materials);
+	ProcessMaterials(scene, model->materialNames);
 
 	aiMatrix4x4 identity;
 
-	ProcessNode(&identity, scene->mRootNode, scene, meshes);
+	ProcessNode(&identity, scene->mRootNode, scene, model->meshes);
 	return true;
 }
 
@@ -54,35 +60,27 @@ void AssimpParser::ProcessMesh(void* transform, aiMesh* mesh, const aiScene* sce
 		aiVector3D tangent = mesh->mTangents ? meshTransformation * mesh->mTangents[i] : aiVector3D(0.0f, 0.0f, 0.0f);
 		aiVector3D bitangent = mesh->mBitangents ? meshTransformation * mesh->mBitangents[i] : aiVector3D(0.0f, 0.0f, 0.0f);
 
-		outVertices.push_back
-		(
-			{
-				Mathgl::Vector3{
-					position.x,
-					position.y,
-					position.z
-				},
-				Mathgl::Vector2{
-					texCoords.x,
-					texCoords.y
-				},
-				Mathgl::Vector3{
-					normal.x,
-					normal.y,
-					normal.z
-				},
-				Mathgl::Vector3{
-					tangent.x,
-					tangent.y,
-					tangent.z
-				},
-				Mathgl::Vector3{
-					bitangent.x,
-					bitangent.y,
-					bitangent.z
-				}
-			}
-		);
+		Vertex v;
+		v.pos[0] = position.x;
+		v.pos[1] = position.y;
+		v.pos[2] = position.z;
+
+		v.norm[0] = normal.x;
+		v.norm[1] = normal.y;
+		v.norm[2] = normal.z;
+
+		v.uv[0] = texCoords.x;
+		v.uv[1] = texCoords.y;
+
+		v.tangent[0] = tangent.x;
+		v.tangent[1] = tangent.y;
+		v.tangent[2] = tangent.z;
+
+		v.bitangent[0] = bitangent.x;
+		v.bitangent[1] = bitangent.y;
+		v.bitangent[2] = bitangent.z;
+
+		outVertices.push_back(v);
 	}
 
 	for (uint32_t faceID = 0; faceID < mesh->mNumFaces; ++faceID) {

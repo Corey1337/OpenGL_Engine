@@ -1,3 +1,8 @@
+#include <string>
+#include <memory>
+#include <string>
+#include "../../src/render/loader.h"
+
 enum class EModelParserFlags {
 	NONE = 0x0,
 	CALC_TANGENT_SPACE = 0x1,
@@ -40,12 +45,11 @@ class AssimpParser {
 public:
 	bool LoadModel(
 		const std::string& fileName,
-		std::vector<Mesh*>& meshes,
-		std::vector<std::string>& materials,
+		std::shared_ptr<Model> model,
 		EModelParserFlags flags
 	);
 private:
-	void ProcessMaterials(const struct aiScene* scene, std::vector<std::string>& materials);;
+	void ProcessMaterials(const struct aiScene* scene, std::vector<std::string>& materials);
 	void ProcessNode(void* transform, struct aiNode* node, const struct aiScene* scene, std::vector<Mesh*>& meshes);
 	void ProcessMesh(void* transform, struct aiMesh* mesh, const struct aiScene* scene, std::vector<Vertex>& outVertices, std::vector<uint32_t>& outIndices);
 };
