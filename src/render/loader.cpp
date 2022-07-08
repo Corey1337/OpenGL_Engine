@@ -1,7 +1,10 @@
 #include "loader.h"
 #include "utils/shaderLoader.h"
 #include "stb/stb_image.h"
+#include "utils/assimpParser.h"
+
 #include <iostream>
+
 
 void Shader::bind()
 {
@@ -69,8 +72,9 @@ void Texture::bind(int texSlot)
     glBindTexture(GL_TEXTURE_2D, id.id);
 }
 
-void Texture::unbind()
+void Texture::unbind(int texSlot)
 {
+    glActiveTexture(GL_TEXTURE0 + texSlot);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -106,7 +110,7 @@ std::shared_ptr<Texture> TextureLoader::load(std::string path)
     }
 
     stbi_image_free(data);
-    texture->unbind();
+    texture->unbind(0);
     return std::shared_ptr<Texture>(texture);
 }
 
@@ -131,4 +135,12 @@ void Mesh::createBuffers(std::vector<Vertex>& p_vertices, std::vector<unsigned>&
     vertexArray.unbind();
     vertexBuffer->unbind();
     vertexBuffer->unbindAttribure();
+}
+
+void Object::set_model(const std::string path)
+{
+    EModelParserFlags flags = EModelParserFlags::TRIANGULATE;
+    flags |= EModelParserFlags::GEN_SMOOTH_NORMALS;
+    flags |= EModelParserFlags::CALC_TANGENT_SPACE;
+    AssimpParser().LoadModel(path, this->model, flags);
 }

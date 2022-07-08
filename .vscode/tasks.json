@@ -14,6 +14,7 @@
                 "${workspaceFolder}\\src\\render\\loader.cpp",
                 "${workspaceFolder}\\libs\\utils\\shaderLoader.cpp",
                 "${workspaceFolder}\\libs\\utils\\assimpParser.cpp",
+                "${workspaceFolder}\\libs\\ImGuiFileDialog\\ImGuiFileDialog.cpp",
                 "D:\\libs\\c++ libs\\imgui\\**.cpp",
 
                 "-I${workspaceFolder}\\libs",

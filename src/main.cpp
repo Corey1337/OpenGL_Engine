@@ -1,4 +1,6 @@
 #include <iostream>
+#include <utility>
+
 #include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 
@@ -13,9 +15,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "utils/assimpParser.h"
-
-using namespace std;
+#include "ImGuiFileDialog/ImGuiFileDialog.h"
 
 int main()
 {
@@ -27,7 +27,8 @@ int main()
 	settings.minorVersion = 3;
 	// settings.attributeFlags = sf::ContextSettings::Core;
 
-	sf::RenderWindow window(sf::VideoMode(800, 600, 32), "First Window", sf::Style::Titlebar | sf::Style::Close, settings);
+	sf::RenderWindow window;
+	window.create(sf::VideoMode(1920, 1080, 32), "OpenGl Engine", sf::Style::Titlebar | sf::Style::Close, settings);
 	// window.setVerticalSyncEnabled(true);
 	window.setActive();
 	window.setFramerateLimit(60);
@@ -38,72 +39,77 @@ int main()
 	// glDepthRange(1.0f, 0.0f);
 
 	(void *)ImGui::SFML::Init(window);
-	ImGui::GetIO().IniFilename = "";
+	// ImGui::GetIO().IniFilename = "";
 
-	glewExperimental = GL_TRUE; // включить все современные функции ogl
+	glewExperimental = GL_TRUE;
 
 	if (GLEW_OK != glewInit())
 	{ // включить glew
-		cout << "Error:: glew not init =(" << endl;
+		std::cout << "Error:: glew not init =(" << std::endl;
 		return -1;
 	}
-
-	glEnable(GL_DEPTH_TEST);
 
 	auto shaderProgram = ShaderLoader::getInstance().load(".\\res\\shaders\\shader");
 
 	std::vector<Vertex> vertices = {
 		// координаты       				 // текстурные координаты
-		Vertex{Vector3(-0.5f, -0.5f, -0.5f),Vector2(0.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f)},
+		Vertex{Vector3(-0.5f, -0.5f, -0.5f), Vector2(0.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f)},
 		Vertex{Vector3(0.5f, -0.5f, -0.5f), Vector2(1.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f)},
-		Vertex{Vector3(0.5f, 0.5f, -0.5f), 	Vector2(1.0f, 1.0f), Vector3(0.0f, 0.0f, -1.0f)},
-		Vertex{Vector3(0.5f, 0.5f, -0.5f), 	Vector2(1.0f, 1.0f), Vector3(0.0f, 0.0f, -1.0f)},
+		Vertex{Vector3(0.5f, 0.5f, -0.5f), Vector2(1.0f, 1.0f), Vector3(0.0f, 0.0f, -1.0f)},
+		Vertex{Vector3(0.5f, 0.5f, -0.5f), Vector2(1.0f, 1.0f), Vector3(0.0f, 0.0f, -1.0f)},
 		Vertex{Vector3(-0.5f, 0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(0.0f, 0.0f, -1.0f)},
-		Vertex{Vector3(-0.5f, -0.5f, -0.5f),Vector2(0.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f)},
+		Vertex{Vector3(-0.5f, -0.5f, -0.5f), Vector2(0.0f, 0.0f), Vector3(0.0f, 0.0f, -1.0f)},
 
 		Vertex{Vector3(-0.5f, -0.5f, 0.5f), Vector2(0.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f)},
-		Vertex{Vector3(0.5f, -0.5f, 0.5f), 	Vector2(1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f)},
-		Vertex{Vector3(0.5f, 0.5f, 0.5f), 	Vector2(1.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f)},
-		Vertex{Vector3(0.5f, 0.5f, 0.5f), 	Vector2(1.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f)},
-		Vertex{Vector3(-0.5f, 0.5f, 0.5f), 	Vector2(0.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f)},
+		Vertex{Vector3(0.5f, -0.5f, 0.5f), Vector2(1.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f)},
+		Vertex{Vector3(0.5f, 0.5f, 0.5f), Vector2(1.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f)},
+		Vertex{Vector3(0.5f, 0.5f, 0.5f), Vector2(1.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f)},
+		Vertex{Vector3(-0.5f, 0.5f, 0.5f), Vector2(0.0f, 1.0f), Vector3(0.0f, 0.0f, 1.0f)},
 		Vertex{Vector3(-0.5f, -0.5f, 0.5f), Vector2(0.0f, 0.0f), Vector3(0.0f, 0.0f, 1.0f)},
 
-		Vertex{Vector3(-0.5f, 0.5f, 0.5f), 	Vector2(1.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f)},
+		Vertex{Vector3(-0.5f, 0.5f, 0.5f), Vector2(1.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f)},
 		Vertex{Vector3(-0.5f, 0.5f, -0.5f), Vector2(1.0f, 1.0f), Vector3(-1.0f, 0.0f, 0.0f)},
-		Vertex{Vector3(-0.5f, -0.5f, -0.5f),Vector2(0.0f, 1.0f), Vector3(-1.0f, 0.0f, 0.0f)},
-		Vertex{Vector3(-0.5f, -0.5f, -0.5f),Vector2(0.0f, 1.0f), Vector3(-1.0f, 0.0f, 0.0f)},
+		Vertex{Vector3(-0.5f, -0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(-1.0f, 0.0f, 0.0f)},
+		Vertex{Vector3(-0.5f, -0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(-1.0f, 0.0f, 0.0f)},
 		Vertex{Vector3(-0.5f, -0.5f, 0.5f), Vector2(0.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f)},
-		Vertex{Vector3(-0.5f, 0.5f, 0.5f), 	Vector2(1.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f)},
+		Vertex{Vector3(-0.5f, 0.5f, 0.5f), Vector2(1.0f, 0.0f), Vector3(-1.0f, 0.0f, 0.0f)},
 
-		Vertex{Vector3(0.5f, 0.5f, 0.5f), 	Vector2(1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f)},
-		Vertex{Vector3(0.5f, 0.5f, -0.5f), 	Vector2(1.0f, 1.0f), Vector3(1.0f, 0.0f, 0.0f)},
+		Vertex{Vector3(0.5f, 0.5f, 0.5f), Vector2(1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f)},
+		Vertex{Vector3(0.5f, 0.5f, -0.5f), Vector2(1.0f, 1.0f), Vector3(1.0f, 0.0f, 0.0f)},
 		Vertex{Vector3(0.5f, -0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(1.0f, 0.0f, 0.0f)},
 		Vertex{Vector3(0.5f, -0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(1.0f, 0.0f, 0.0f)},
-		Vertex{Vector3(0.5f, -0.5f, 0.5f), 	Vector2(0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f)},
-		Vertex{Vector3(0.5f, 0.5f, 0.5f), 	Vector2(1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f)},
+		Vertex{Vector3(0.5f, -0.5f, 0.5f), Vector2(0.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f)},
+		Vertex{Vector3(0.5f, 0.5f, 0.5f), Vector2(1.0f, 0.0f), Vector3(1.0f, 0.0f, 0.0f)},
 
-		Vertex{Vector3(-0.5f, -0.5f, -0.5f),Vector2(0.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
+		Vertex{Vector3(-0.5f, -0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
 		Vertex{Vector3(0.5f, -0.5f, -0.5f), Vector2(1.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
-		Vertex{Vector3(0.5f, -0.5f, 0.5f), 	Vector2(1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
-		Vertex{Vector3(0.5f, -0.5f, 0.5f), 	Vector2(1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
+		Vertex{Vector3(0.5f, -0.5f, 0.5f), Vector2(1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
+		Vertex{Vector3(0.5f, -0.5f, 0.5f), Vector2(1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
 		Vertex{Vector3(-0.5f, -0.5f, 0.5f), Vector2(0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
-		Vertex{Vector3(-0.5f, -0.5f, -0.5f),Vector2(0.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
+		Vertex{Vector3(-0.5f, -0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
 
 		Vertex{Vector3(-0.5f, 0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
-		Vertex{Vector3(0.5f, 0.5f, -0.5f), 	Vector2(1.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
-		Vertex{Vector3(0.5f, 0.5f, 0.5f), 	Vector2(1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
-		Vertex{Vector3(0.5f, 0.5f, 0.5f), 	Vector2(1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
-		Vertex{Vector3(-0.5f, 0.5f, 0.5f), 	Vector2(0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
+		Vertex{Vector3(0.5f, 0.5f, -0.5f), Vector2(1.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
+		Vertex{Vector3(0.5f, 0.5f, 0.5f), Vector2(1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
+		Vertex{Vector3(0.5f, 0.5f, 0.5f), Vector2(1.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
+		Vertex{Vector3(-0.5f, 0.5f, 0.5f), Vector2(0.0f, 0.0f), Vector3(0.0f, -1.0f, 0.0f)},
 		Vertex{Vector3(-0.5f, 0.5f, -0.5f), Vector2(0.0f, 1.0f), Vector3(0.0f, -1.0f, 0.0f)},
 	};
 
-	EModelParserFlags flags = EModelParserFlags::TRIANGULATE;
-	flags |= EModelParserFlags::GEN_SMOOTH_NORMALS;
-	flags |= EModelParserFlags::CALC_TANGENT_SPACE;
-	std::shared_ptr<Model> m0 = std::make_shared<Model>();
-	AssimpParser().LoadModel(".\\res\\models\\pistol_colt\\colt low polyfbx.fbx", m0, flags);
-	// AssimpParser().LoadModel(".\\res\\models\\ussr_furniture\\ussr_low3.fbx", m0, flags);
-	// AssimpParser().LoadModel(".\\res\\models\\axe\\axe_hp.fbx", m0, flags);
+	std::vector<Object> objects;
+	Object obj1;
+	obj1.set_name("pistol");
+	obj1.set_model(".\\res\\models\\pistol_colt\\colt low polyfbx.fbx");
+	obj1.set_texture(".\\res\\models\\pistol_colt\\colt_low_polyfbx_m1911_BaseColor.png");
+	obj1.set_texture_norm(".\\res\\models\\pistol_colt\\colt_low_polyfbx_m1911_Normal.png");
+	objects.push_back(obj1);
+
+	Object obj2;
+	obj2.set_name("axe");
+	obj2.set_model(".\\res\\models\\axe\\axe_hp.fbx");
+	obj2.set_texture(".\\res\\models\\axe\\AXE_vertexcolor.png");
+	obj2.set_texture_norm(".\\res\\models\\axe\\AXE_normal.png");
+	objects.push_back(obj2);
 
 	// VertexArray VAO;
 	// VAO.bind();
@@ -122,14 +128,6 @@ int main()
 	// VAO.unbind();
 	// VBO.unbind();
 
-	//auto texture = TextureLoader::getInstance().load(".\\res\\imgs\\aska.jpg");
-	auto texture = TextureLoader::getInstance().load(".\\res\\models\\pistol_colt\\colt_low_polyfbx_m1911_BaseColor.png");
-	auto textureNorm = TextureLoader::getInstance().load(".\\res\\models\\pistol_colt\\colt_low_polyfbx_m1911_Normal.png");
-	// auto texture = TextureLoader::getInstance().load(".\\res\\models\\ussr_furniture\\ussr_low3_Material__25_BaseColor.png");
-	// auto textureNorm = TextureLoader::getInstance().load(".\\res\\models\\ussr_furniture\\ussr_low3_Material__25_Normal.png");
-	// auto texture = TextureLoader::getInstance().load(".\\res\\models\\axe\\AXE_vertexcolor.png");
-	// auto textureNorm = TextureLoader::getInstance().load(".\\res\\models\\axe\\AXE_normal.png");
-
 	auto cameraPos = Vector3(3.0f, 3.0f, 3.0f);
 
 	auto lightPos = Vector3(0.0f, 0.0f, 5.0f);
@@ -142,11 +140,7 @@ int main()
 
 	bool isGo = true;
 
-	Vector3 scale_vec(1.0f);
 	Vector3 translate_vec(0.0f);
-	float deg = 0.0f;
-	Vector3 spin_vec(0.0f);
-	float spinSpeed = 0.0f;
 
 	sf::Clock deltaClock;
 	while (isGo)
@@ -154,8 +148,7 @@ int main()
 		sf::Event windowEvent;
 
 		while (window.pollEvent(windowEvent))
-		{ // обработка ивентов
-
+		{
 			ImGui::SFML::ProcessEvent(windowEvent);
 
 			switch (windowEvent.type)
@@ -163,6 +156,8 @@ int main()
 			case sf::Event::Closed:
 				isGo = false;
 				break;
+			case sf::Event::Resized:
+				glViewport(0, 0, windowEvent.size.width, windowEvent.size.height);
 			default:
 				break;
 			}
@@ -173,23 +168,15 @@ int main()
 
 		glEnable(GL_DEPTH_TEST);
 
-		texture->bind(0);
-		textureNorm->bind(1);
+		// texture->bind(0);
+		// textureNorm->bind(1);
 
 		shaderProgram->bind();
 
 		// VAO.bind();
 
-		Mat4 translation = translationMat(translate_vec);
-		Mat4 rotation = rotateMat(spin_vec, radians(deg));
-		Mat4 scale = scaleMat(scale_vec);
-		Mat4 model = CraeteModelMatrix(translation, rotation, scale);
 		Mat4 view = CreateViewMatrix(cameraPos, Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
 		Mat4 proj = perspective(radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-		deg += spinSpeed;
-
-
 
 		shaderProgram->setUniformVec3("light.ambient", lightAmb);
 		shaderProgram->setUniformVec3("light.diffuse", lightDiff);
@@ -203,108 +190,239 @@ int main()
 
 		shaderProgram->setUniformVec3("viewPos", cameraPos);
 
-		shaderProgram->setUniformMat4("model", model);
 		shaderProgram->setUniformMat4("view", view);
 		shaderProgram->setUniformMat4("projection", proj);
 
-		for (auto& m : m0->meshes)
+		for (auto &obj_ : objects)
 		{
-			m->bind();
-
-			glDrawElements(GL_TRIANGLES, m->getIndexCount(), GL_UNSIGNED_INT, 0);
-
-			m->unbind();
+			obj_.bind();
+			Mat4 translation = translationMat(obj_.get_position());
+			Mat4 rotation = rotateMat(obj_.get_rotation().spin_vec, radians(obj_.get_rotation().spin_deg));
+			Mat4 scale = scaleMat(obj_.get_scale());
+			Mat4 model = CraeteModelMatrix(translation, rotation, scale);
+			shaderProgram->setUniformMat4("model", model);
+			obj_.draw();
+			obj_.unbind();
 		}
-		// glBindVertexArray(0);
-		// glDisableVertexArrayAttrib(0);
-		// glUseProgram(0);
-
-		// glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		// VAO.unbind();
-
-		// VBO.unbindAttribure();
-
-		texture->unbind();
 
 		shaderProgram->unbind();
 
 		ImGui::SFML::Update(window, deltaClock.restart());
-
 		ImGui::Begin("Window title");
 
 		{
 			static int tabb = 0;
 			ImGui::SameLine();
-			if (ImGui::Button("Scale", ImVec2(150, 25)))
+			if (ImGui::Button("Objects", ImVec2(150, 25)))
 			{
 				tabb = 0;
 			}
 			ImGui::SameLine();
-			if (ImGui::Button("Rotate", ImVec2(150, 25)))
+			if (ImGui::Button("Light", ImVec2(150, 25)))
 			{
 				tabb = 1;
 			}
 			ImGui::SameLine();
-			if (ImGui::Button("Translate", ImVec2(150, 25)))
+			if (ImGui::Button("Settings", ImVec2(150, 25)))
 			{
 				tabb = 2;
 			}
-			ImGui::SameLine();
-			if (ImGui::Button("Light", ImVec2(150, 25)))
-			{
-				tabb = 3;
-			}
 			if (tabb == 0)
 			{
-				static float scaleV[3] = {1.0f, 1.0f, 1.0f};
-				if (ImGui::SliderFloat("Scale prop", &scaleV[0], -10.0f, 10.0f))
+				static char selectedItem[255];
+				static int selected_ind = -1;
+				bool selected[objects.size()];
+
+				static float scaleV[3];
+				static float spinV[3];
+				static float deg;
+				static float transV[3];
+
+				if (selected_ind != -1)
 				{
-					scaleV[1] = scaleV[0];
-					scaleV[2] = scaleV[0];
-					scale_vec.x = scaleV[0];
-					scale_vec.y = scaleV[1];
-					scale_vec.z = scaleV[2];
+					selected[selected_ind] = true;
+					strcpy(selectedItem, objects[selected_ind].get_name().c_str());
 				}
 
-				if (ImGui::SliderFloat3("Scale", scaleV, -10.0f, 10.0f))
+				if (ImGui::BeginCombo("ObjectList", selectedItem))
 				{
-					scale_vec.x = scaleV[0];
-					scale_vec.y = scaleV[1];
-					scale_vec.z = scaleV[2];
+
+					for (int i = 0; i < objects.size(); i++)
+					{
+						if (ImGui::Selectable(objects[i].get_name().c_str(), &selected[i]))
+						{
+							selected_ind = i;
+
+							strcpy(selectedItem, objects[selected_ind].get_name().c_str());
+
+							{
+								auto temp = objects[selected_ind].get_scale();
+								scaleV[0] = temp.x;
+								scaleV[1] = temp.y;
+								scaleV[2] = temp.z;
+							}
+
+							{
+								auto temp = objects[selected_ind].get_rotation();
+								spinV[0] = temp.spin_vec.x;
+								spinV[1] = temp.spin_vec.y;
+								spinV[2] = temp.spin_vec.z;
+								deg = temp.spin_deg;
+							}
+
+							{
+								auto temp = objects[selected_ind].get_position();
+								transV[0] = temp.x;
+								transV[1] = temp.y;
+								transV[2] = temp.z;
+							}
+						}
+					}
+					ImGui::EndCombo();
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Add", ImVec2(125, 25)))
+				{
+					ImGui::OpenPopup("Create object");
+				}
+
+				bool open = true;
+				if (ImGui::BeginPopupModal("Create object", &open))
+				{
+					std::string obj_name;
+					std::string obj_model_path;
+					std::string obj_texture_path;
+					std::string obj_normal_path;
+
+					if (ImGui::Button("Choose Modes"))
+					{
+						ImGuiFileDialog::Instance()->OpenModal("ChooseModel", "Choose File", "Model files (*.fbx *.obj){.fbx,.obj}", ".\\res\\");
+					}
+					if (ImGuiFileDialog::Instance()->Display("ChooseModel"))
+					{
+						if (ImGuiFileDialog::Instance()->IsOk())
+						{
+							std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+							std::string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
+							std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+						}
+						ImGuiFileDialog::Instance()->Close();
+					}
+
+					if (ImGui::Button("Choose Texture"))
+					{
+						ImGuiFileDialog::Instance()->OpenModal("ChooseTexture", "Choose File", "Image files (*.png *.gif *.jpg *.jpeg){.png,.gif,.jpg,.jpeg}", ".\\res\\");
+					}
+					if (ImGuiFileDialog::Instance()->Display("ChooseTexture"))
+					{
+						if (ImGuiFileDialog::Instance()->IsOk())
+						{
+							std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+							std::string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
+							std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+						}
+						ImGuiFileDialog::Instance()->Close();
+					}
+
+					if (ImGui::Button("Choose Normal Texture"))
+					{
+						ImGuiFileDialog::Instance()->OpenModal("ChooseNormal", "Choose File", "Image files (*.png *.gif *.jpg *.jpeg){.png,.gif,.jpg,.jpeg}", ".\\res\\");
+					}
+					if (ImGuiFileDialog::Instance()->Display("ChooseNormal"))
+					{
+						if (ImGuiFileDialog::Instance()->IsOk())
+						{
+							std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+							std::string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
+							std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+						}
+						ImGuiFileDialog::Instance()->Close();
+					}
+
+					if (ImGui::Button("Create"))
+					{
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("Close"))
+					{
+						ImGui::CloseCurrentPopup();
+					}
+					ImGui::EndPopup();
+				}
+
+				if (selected_ind != -1)
+				{
+					if (ImGui::InputText("Change name", &selectedItem[0], sizeof(selectedItem)))
+					{
+						objects[selected_ind].set_name(selectedItem);
+					}
+
+					ImGui::LabelText("", "Scale obj");
+					{
+						if (ImGui::SliderFloat("Scale prop", &scaleV[0], -10.0f, 10.0f))
+						{
+							scaleV[1] = scaleV[0];
+							scaleV[2] = scaleV[0];
+							objects[selected_ind].set_scale(Vector3(scaleV[0], scaleV[1], scaleV[2]));
+						}
+						if (ImGui::SliderFloat3("Scale", scaleV, -10.0f, 10.0f))
+						{
+							objects[selected_ind].set_scale(Vector3(scaleV[0], scaleV[1], scaleV[2]));
+						}
+					}
+					ImGui::LabelText("", "Spin obj");
+					{
+						if (ImGui::SliderFloat3("Spin vector", spinV, -10.0f, 10.0f) || ImGui::SliderFloat("Degree", &deg, -360.0f, 360.0f))
+						{
+							objects[selected_ind].set_rotation(Vector3(spinV[0], spinV[1], spinV[2]), deg);
+						}
+					}
+					ImGui::LabelText("", "Translate obj");
+					{
+						if (ImGui::SliderFloat3("Translate vector", transV, -10.0f, 10.0f))
+						{
+							objects[selected_ind].set_position(Vector3(transV[0], transV[1], transV[2]));
+						}
+					}
 				}
 			}
+
 			if (tabb == 1)
-			{
-				static float spinV[3] = {0.0f, 0.0f, 0.0f};
-				if(ImGui::SliderFloat3("Spin vector", spinV, -10.0f, 10.0f))
-				{
-					spin_vec[0] = spinV[0];
-					spin_vec[1] = spinV[1];
-					spin_vec[2] = spinV[2];
-				}
-				ImGui::SliderFloat("Degree", &deg, -360.0f, 360.0f);
-				ImGui::SliderFloat("Spin speed", &spinSpeed, -360.0f, 360.0f);
-			}
-			if (tabb == 2)
-			{
-				static float transV[3] = {0.0f, 0.0f, 0.0f};
-				if(ImGui::SliderFloat3("Translate vector", transV, -10.0f, 10.0f))
-				{
-					translate_vec[0] = transV[0];
-					translate_vec[1] = transV[1];
-					translate_vec[2] = transV[2];
-				}
-			}
-			if(tabb == 3)
 			{
 				static float lightPosV[3] = {0.0f, 0.0f, 0.0f};
 				ImGui::SliderFloat("Shininess", &materialShine, 0.0f, 32.0f);
-				if(ImGui::SliderFloat3("LightPos", lightPosV, -10.0f, 10.0f))
+				if (ImGui::SliderFloat3("LightPos", lightPosV, -10.0f, 10.0f))
 				{
 					lightPos[0] = lightPosV[0];
 					lightPos[1] = lightPosV[1];
 					lightPos[2] = lightPosV[2];
+				}
+			}
+			if (tabb == 2)
+			{
+				static char title[255] = "OpenGl Engine";
+				ImGui::InputText("Window title", title, sizeof(title));
+
+				const char *res_listbox_items[] = {"1920x1080", "1680x1050", "1440x900", "1200x800", "1280x720", "854x480"};
+				std::vector<sf::Vector2u> res_listbox_items_ = {{1920, 1080}, {1680, 1050}, {1440, 900}, {1200, 800}, {1280, 720}, {854, 480}};
+				static int res_listbox_item_current = 0;
+				ImGui::Combo("Resolution", &res_listbox_item_current, res_listbox_items, IM_ARRAYSIZE(res_listbox_items));
+
+				static bool is_fullscreen = false;
+				ImGui::Checkbox("Fullscreen", &is_fullscreen);
+
+				if (ImGui::Button("Apply", ImVec2(125, 25)))
+				{
+					if (is_fullscreen)
+					{
+						window.create(sf::VideoMode::getFullscreenModes()[0], "First Window", sf::Style::Titlebar | sf::Style::Close | sf::Style::Fullscreen, settings);
+					}
+					else
+					{
+						window.create(sf::VideoMode(window.getSize().x, window.getSize().y, 32), "First Window", sf::Style::Titlebar | sf::Style::Close, settings);
+					}
+					window.setSize(res_listbox_items_[res_listbox_item_current]);
+					window.setTitle(title);
 				}
 			}
 		}

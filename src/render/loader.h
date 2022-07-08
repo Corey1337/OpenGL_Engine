@@ -49,7 +49,7 @@ class Texture
 
 public:
     void bind(int texSlot);
-    void unbind();
+    void unbind(int texSlot);
 };
 
 class TextureLoader
@@ -118,17 +118,19 @@ public:
         glEnableVertexAttribArray(index);
     }
 
-        void unbindAttribure()
+    void unbindAttribure()
     {
         glDisableVertexAttribArray(0);
     }
 };
 
-class IndexBuffer {
+class IndexBuffer
+{
     Id<IndexBuffer> id;
 
 public:
-    enum class UsageType : uint8_t{
+    enum class UsageType : uint8_t
+    {
         STREAM_DRAW,
         STREAM_READ,
         STREAM_COPY,
@@ -164,18 +166,16 @@ public:
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
-
 };
 
 class Mesh
 {
 public:
-    Mesh(std::vector<Vertex>& vertices, std::vector<unsigned>& indices, unsigned materialIndex):
-    vertexCount(static_cast<unsigned>(vertices.size())),
-    indicesCount(static_cast<unsigned>(vertices.size())),
-    materialIndex(materialIndex),
-    indices(indices),
-    vertices(vertices)
+    Mesh(std::vector<Vertex> &vertices, std::vector<unsigned> &indices, unsigned materialIndex) : vertexCount(static_cast<unsigned>(vertices.size())),
+                                                                                                  indicesCount(static_cast<unsigned>(vertices.size())),
+                                                                                                  materialIndex(materialIndex),
+                                                                                                  indices(indices),
+                                                                                                  vertices(vertices)
     {
         createBuffers(vertices, indices);
     }
@@ -183,28 +183,33 @@ public:
     std::vector<unsigned> indices;
     ~Mesh() = default;
 
-    virtual void bind() {
+    virtual void bind()
+    {
         vertexArray.bind();
     }
 
-    virtual void unbind() {
+    virtual void unbind()
+    {
         vertexArray.unbind();
     }
 
-    virtual unsigned getVertexCount() {
+    virtual unsigned getVertexCount()
+    {
         return vertexCount;
     }
 
-    virtual unsigned getIndexCount() {
+    virtual unsigned getIndexCount()
+    {
         return indicesCount;
     }
 
-    uint32_t getMaterialIndex() const {
+    uint32_t getMaterialIndex() const
+    {
         return materialIndex;
     }
 
 private:
-    void createBuffers(std::vector<Vertex>& p_vertices, std::vector<unsigned>& p_indices);
+    void createBuffers(std::vector<Vertex> &p_vertices, std::vector<unsigned> &p_indices);
 
 public:
     const unsigned int vertexCount;
@@ -221,6 +226,115 @@ public:
 class Model
 {
 public:
-    std::vector<Mesh*> meshes;
+    std::vector<Mesh *> meshes;
     std::vector<std::string> materialNames;
+};
+
+class Object
+{
+    struct Spin
+    {
+        Vector3 spin_vec;
+        float spin_deg;
+    };
+public:
+
+    Object()
+    {
+        this->position = Vector3(0.0f);
+        this->scale = Vector3(1.0f);
+        this->spin = { Vector3(0.0f), 0.0f };
+        this->model = std::make_shared<Model>();
+    }
+
+    void draw()
+    {
+        for (auto &m : this->model->meshes)
+            glDrawElements(GL_TRIANGLES, m->getIndexCount(), GL_UNSIGNED_INT, 0);
+    }
+
+    void bind()
+    {
+        this->texture->bind(0);
+        this->textureNorm->bind(1);
+        for (auto &m : this->model->meshes)
+			m->bind();
+    }
+
+    void unbind()
+    {
+        this->texture->unbind(0);
+        this->textureNorm->unbind(1);
+        for (auto &m : this->model->meshes)
+			m->unbind();
+    }
+
+    void set_name(std::string name)
+    {
+        this->name = name;
+    }
+
+    std::string get_name()
+    {
+        return this->name;
+    }
+
+    void set_model(const std::string path);
+
+    void set_texture(std::string path)
+    {
+        this->texture = TextureLoader::getInstance().load(path);
+    }
+
+    void set_texture_norm(std::string path)
+    {
+        this->textureNorm = TextureLoader::getInstance().load(path);
+    }
+
+    void set_position(Vector3 pos)
+    {
+        this->position = pos;
+    }
+
+    Vector3 get_position()
+    {
+        return this->position;
+    }
+
+    void set_scale(Vector3 scale)
+    {
+        this->scale = scale;
+    }
+
+    Vector3 get_scale()
+    {
+        return this->scale;
+    }
+
+    void set_rotation(Vector3 spin_vec, float spin_deg)
+    {
+        if (spin_deg > 360)
+            spin_deg = 360;
+        else if (spin_deg < -360)
+            spin_deg = -360;
+        this->spin = {spin_vec, spin_deg};
+    }
+
+    Spin get_rotation()
+    {
+        return this->spin;
+    }
+
+private:
+    Id<Object> id;
+    std::string name;
+    std::shared_ptr<Model> model;
+    std::shared_ptr<Texture> texture;
+    std::shared_ptr<Texture> textureNorm;
+    Vector3 position;
+    Vector3 scale;
+    Spin spin;
+    int rotationX;
+    int rotationY;
+    int rotationZ;
 };

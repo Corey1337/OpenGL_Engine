@@ -1,7 +1,9 @@
+#pragma once
+
 #include <string>
 #include <memory>
-#include <string>
-#include "../../src/render/loader.h"
+#include <vector>
+#include "render/loader.h"
 
 enum class EModelParserFlags {
 	NONE = 0x0,
