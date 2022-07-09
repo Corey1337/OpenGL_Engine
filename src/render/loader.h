@@ -239,12 +239,18 @@ class Object
     };
 public:
 
-    Object()
+    Object(std::string obj_name, std::string model_path, std::string texture_path = "", std::string normal_path = "")
     {
+        this->set_name(obj_name);
         this->position = Vector3(0.0f);
         this->scale = Vector3(1.0f);
         this->spin = { Vector3(0.0f), 0.0f };
         this->model = std::make_shared<Model>();
+        this->set_model(model_path);
+        if (texture_path != "")
+            this->set_texture(texture_path);
+        if (normal_path != "")    
+            this->set_texture_norm(normal_path);
     }
 
     void draw()
@@ -255,8 +261,14 @@ public:
 
     void bind()
     {
-        this->texture->bind(0);
-        this->textureNorm->bind(1);
+        if (this->texture != 0x0)
+        {
+            this->texture->bind(0);
+        }
+        if (this->textureNorm != 0x0)
+        {
+            this->textureNorm->bind(1);
+        }
         for (auto &m : this->model->meshes)
 			m->bind();
     }

@@ -97,19 +97,6 @@ int main()
 	};
 
 	std::vector<Object> objects;
-	Object obj1;
-	obj1.set_name("pistol");
-	obj1.set_model(".\\res\\models\\pistol_colt\\colt low polyfbx.fbx");
-	obj1.set_texture(".\\res\\models\\pistol_colt\\colt_low_polyfbx_m1911_BaseColor.png");
-	obj1.set_texture_norm(".\\res\\models\\pistol_colt\\colt_low_polyfbx_m1911_Normal.png");
-	objects.push_back(obj1);
-
-	Object obj2;
-	obj2.set_name("axe");
-	obj2.set_model(".\\res\\models\\axe\\axe_hp.fbx");
-	obj2.set_texture(".\\res\\models\\axe\\AXE_vertexcolor.png");
-	obj2.set_texture_norm(".\\res\\models\\axe\\AXE_normal.png");
-	objects.push_back(obj2);
 
 	// VertexArray VAO;
 	// VAO.bind();
@@ -289,22 +276,34 @@ int main()
 				bool open = true;
 				if (ImGui::BeginPopupModal("Create object", &open))
 				{
-					std::string obj_name;
-					std::string obj_model_path;
-					std::string obj_texture_path;
-					std::string obj_normal_path;
+					static std::string obj_name, obj_model_path, obj_texture_path, obj_normal_path = "";
 
-					if (ImGui::Button("Choose Modes"))
+					static char obj_name_[255];
+					if (ImGui::InputText("Object name", obj_name_, sizeof(obj_name_)))
+						obj_name = obj_name_;
+
+					if (ImGui::Button("Choose Model"))
 					{
 						ImGuiFileDialog::Instance()->OpenModal("ChooseModel", "Choose File", "Model files (*.fbx *.obj){.fbx,.obj}", ".\\res\\");
+					}
+					static std::string model_name;
+					if(model_name != "")
+					{
+						ImGui::SameLine();
+						ImGui::BulletText(model_name.c_str());
+						ImGui::SameLine();
+						if (ImGui::Button("X"))
+						{
+							model_name = "";
+							obj_model_path = "";
+						}
 					}
 					if (ImGuiFileDialog::Instance()->Display("ChooseModel"))
 					{
 						if (ImGuiFileDialog::Instance()->IsOk())
 						{
-							std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-							std::string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
-							std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+							obj_model_path = ImGuiFileDialog::Instance()->GetFilePathName();
+							model_name = ImGuiFileDialog::Instance()->GetCurrentFileName();
 						}
 						ImGuiFileDialog::Instance()->Close();
 					}
@@ -313,13 +312,24 @@ int main()
 					{
 						ImGuiFileDialog::Instance()->OpenModal("ChooseTexture", "Choose File", "Image files (*.png *.gif *.jpg *.jpeg){.png,.gif,.jpg,.jpeg}", ".\\res\\");
 					}
+					static std::string texture_name;
+					if(texture_name != "")
+					{
+						ImGui::SameLine();
+						ImGui::BulletText(texture_name.c_str());
+						ImGui::SameLine();
+						if (ImGui::Button("X"))
+						{
+							texture_name = "";
+							obj_texture_path = "";
+						}
+					}
 					if (ImGuiFileDialog::Instance()->Display("ChooseTexture"))
 					{
 						if (ImGuiFileDialog::Instance()->IsOk())
 						{
-							std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-							std::string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
-							std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+							obj_texture_path = ImGuiFileDialog::Instance()->GetFilePathName();
+							texture_name = ImGuiFileDialog::Instance()->GetCurrentFileName();
 						}
 						ImGuiFileDialog::Instance()->Close();
 					}
@@ -328,23 +338,52 @@ int main()
 					{
 						ImGuiFileDialog::Instance()->OpenModal("ChooseNormal", "Choose File", "Image files (*.png *.gif *.jpg *.jpeg){.png,.gif,.jpg,.jpeg}", ".\\res\\");
 					}
+					static std::string normal_name;
+					if(normal_name != "")
+					{
+						ImGui::SameLine();
+						ImGui::BulletText(normal_name.c_str());
+						ImGui::SameLine();
+						if (ImGui::Button("X"))
+						{
+							normal_name = "";
+							obj_normal_path = "";
+						}
+					}
 					if (ImGuiFileDialog::Instance()->Display("ChooseNormal"))
 					{
 						if (ImGuiFileDialog::Instance()->IsOk())
 						{
-							std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-							std::string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
-							std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+							obj_normal_path = ImGuiFileDialog::Instance()->GetFilePathName();
+							normal_name = ImGuiFileDialog::Instance()->GetCurrentFileName();
 						}
 						ImGuiFileDialog::Instance()->Close();
 					}
 
-					if (ImGui::Button("Create"))
+					if (ImGui::Button("Create") && model_name != "" && obj_name != "")
 					{
+						objects.emplace_back(obj_name, obj_model_path, obj_texture_path, obj_texture_path);
+						obj_name = "";
+						strcpy(obj_name_, "");
+						obj_model_path = "";
+						obj_texture_path = "";
+						obj_normal_path = "";
+						model_name = "";
+						texture_name = "";
+						normal_name = "";
+						ImGui::CloseCurrentPopup();
 					}
 					ImGui::SameLine();
 					if (ImGui::Button("Close"))
 					{
+						obj_name = "";
+						strcpy(obj_name_, "");
+						obj_model_path = "";
+						obj_texture_path = "";
+						obj_normal_path = "";
+						model_name = "";
+						texture_name = "";
+						normal_name = "";
 						ImGui::CloseCurrentPopup();
 					}
 					ImGui::EndPopup();
@@ -383,6 +422,12 @@ int main()
 						{
 							objects[selected_ind].set_position(Vector3(transV[0], transV[1], transV[2]));
 						}
+					}
+					if (ImGui::Button("Delete obj"))
+					{
+						objects.erase(objects.begin() + selected_ind);
+						selected_ind = -1;
+						strcpy(selectedItem, "");
 					}
 				}
 			}
