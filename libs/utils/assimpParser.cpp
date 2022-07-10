@@ -1,10 +1,5 @@
 #include "assimpParser.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/matrix4x4.h>
-#include <assimp/postprocess.h>
-
 bool AssimpParser::LoadModel(const std::string& fileName, std::shared_ptr<Model> model, EModelParserFlags flags) {
 	
 	Assimp::Importer import;
@@ -37,7 +32,7 @@ void AssimpParser::ProcessNode(void* transform, aiNode* node, const aiScene* sce
 	aiMatrix4x4 nodeTransformation = *reinterpret_cast<aiMatrix4x4*>(transform) * node->mTransformation;
 	
 	for (uint32_t i = 0; i < node->mNumMeshes; ++i) {
-		std::vector<Vertex> vertices;
+		std::vector<ew::Vertex> vertices;
 		std::vector<uint32_t> indices;
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		ProcessMesh(&nodeTransformation, mesh, scene, vertices, indices);
@@ -50,7 +45,7 @@ void AssimpParser::ProcessNode(void* transform, aiNode* node, const aiScene* sce
 	}
 }
 
-void AssimpParser::ProcessMesh(void* transform, aiMesh* mesh, const aiScene* scene, std::vector<Vertex>& outVertices, std::vector<uint32_t>& outIndices) {
+void AssimpParser::ProcessMesh(void* transform, aiMesh* mesh, const aiScene* scene, std::vector<ew::Vertex>& outVertices, std::vector<uint32_t>& outIndices) {
 	aiMatrix4x4 meshTransformation = *reinterpret_cast<aiMatrix4x4*>(transform);
 
 	for (uint32_t i = 0; i < mesh->mNumVertices; ++i) {
@@ -60,7 +55,7 @@ void AssimpParser::ProcessMesh(void* transform, aiMesh* mesh, const aiScene* sce
 		aiVector3D tangent = mesh->mTangents ? meshTransformation * mesh->mTangents[i] : aiVector3D(0.0f, 0.0f, 0.0f);
 		aiVector3D bitangent = mesh->mBitangents ? meshTransformation * mesh->mBitangents[i] : aiVector3D(0.0f, 0.0f, 0.0f);
 
-		Vertex v;
+		ew::Vertex v;
 		v.pos[0] = position.x;
 		v.pos[1] = position.y;
 		v.pos[2] = position.z;

@@ -28,14 +28,14 @@ uniform vec3 viewPos;
 void main() {
 
 	vec3 norm = texture(material.normalMap, UvTex).rgb;
-	norm = normalize(norm * 2.0 - 1.0);
+	norm = norm * 2.0 - 1.0;
+	norm = normalize(TBNmat * norm);
 
 
 	//ambient
 	vec3 ambient = light.ambient * texture(material.diffuse, UvTex).rgb;
 
 	// diffuse
-	norm = normalize(TBNmat * Norm);
 
 	vec3 lightDir = normalize(light.position - FragPos);
 	float diff = max(dot(norm, lightDir), 0.0);

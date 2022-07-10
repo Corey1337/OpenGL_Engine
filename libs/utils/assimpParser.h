@@ -1,9 +1,12 @@
 #pragma once
 
-#include <string>
-#include <memory>
-#include <vector>
-#include "render/loader.h"
+#include "ew.h"
+#include "model.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/matrix4x4.h>
+#include <assimp/postprocess.h>
 
 enum class EModelParserFlags {
 	NONE = 0x0,
@@ -53,5 +56,5 @@ public:
 private:
 	void ProcessMaterials(const struct aiScene* scene, std::vector<std::string>& materials);
 	void ProcessNode(void* transform, struct aiNode* node, const struct aiScene* scene, std::vector<Mesh*>& meshes);
-	void ProcessMesh(void* transform, struct aiMesh* mesh, const struct aiScene* scene, std::vector<Vertex>& outVertices, std::vector<uint32_t>& outIndices);
+	void ProcessMesh(void* transform, struct aiMesh* mesh, const struct aiScene* scene, std::vector<ew::Vertex>& outVertices, std::vector<uint32_t>& outIndices);
 };
