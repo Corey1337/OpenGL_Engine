@@ -29,7 +29,7 @@ Vector3 Camera::get_direction()
 void Camera::render(std::shared_ptr<Shader>* shaderProgram)
 {
     auto temp = *shaderProgram;
-    Mat4 view = CreateViewMatrix(position, Vector3(0.0f, 0.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+    Mat4 view = CreateViewMatrix(position, direction, Vector3(0.0f, 1.0f, 0.0f));
     temp->setUniformVec3("viewPos", position);
     temp->setUniformMat4("view", view);
 }

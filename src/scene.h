@@ -4,7 +4,9 @@
 #include "object.h"
 #include "camera.h"
 #include "shader.h"
-#include "primitives.h"
+#include "cube.h"
+#include "pyramid.h"
+#include "sphere.h"
 #include "light.h"
 
 class Scene
@@ -22,6 +24,11 @@ public:
     std::shared_ptr<Light> get_light()
     {
         return light;
+    }
+
+    std::shared_ptr<Camera> get_camera()
+    {
+        return camera;
     }
 
 private:

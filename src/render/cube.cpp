@@ -1,4 +1,4 @@
-#include "primitives.h"
+#include "cube.h"
 
 void Cube::set_model(const std::string path)
 {

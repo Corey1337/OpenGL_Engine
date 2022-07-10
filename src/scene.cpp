@@ -6,10 +6,6 @@ Scene::Scene()
 {
 
     objects = std::make_shared<std::vector<Object *>>();
-
-    static Cube cube("cube");
-	cube.set_texture("E:\\source\\vscode repos\\OpenGL_Engine\\res\\imgs\\aska.jpg");
-	this->objects->push_back(&cube);
     
     camera = std::make_shared<Camera>(Vector3(3.0f), Vector3(0.0f));
     light = std::make_shared<Light>();
