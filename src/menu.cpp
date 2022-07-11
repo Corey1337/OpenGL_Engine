@@ -6,10 +6,11 @@
 #include "menu_units/settings_tab.hpp"
 #include "menu_units/camera_tab.hpp"
 
-Menu::Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Scene> scene)
+Menu::Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Scene> scene, std::shared_ptr<GL> gl)
 {
 	win_ = window;
 	scene_ = scene;
+	gl_ = gl;
 	(void *)ImGui::SFML::Init(*win_);
 	ImGui::StyleColorsDark();
 	deltaClock = std::make_shared<sf::Clock>();

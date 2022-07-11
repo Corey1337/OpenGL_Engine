@@ -17,7 +17,7 @@ App::App(const std::string &app_name)
     window->setFramerateLimit(60);
     gl = std::make_shared<GL>();
     scene = std::make_shared<Scene>();
-    menu = std::make_shared<Menu>(window, scene);
+    menu = std::make_shared<Menu>(window, scene, gl);
 }
 
 void App::loop()

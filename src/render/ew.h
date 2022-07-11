@@ -17,6 +17,7 @@ namespace ew
     template <typename T>
     struct Id
     {
+        Id(size_t id_ = 0) : id(id_) {}
         unsigned id = 0;
     };
 

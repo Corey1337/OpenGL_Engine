@@ -9,13 +9,14 @@
 #include "ImGuiFileDialog/ImGuiFileDialog.h"
 
 #include "scene.h"
+#include "GL.h"
 
 #include <SFML/Graphics.hpp>
 
 class Menu
 {
 public:
-    Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Scene> scene);
+    Menu(std::shared_ptr<sf::RenderWindow> window, std::shared_ptr<Scene> scene, std::shared_ptr<GL> gl);
 
     void render();
 
@@ -40,5 +41,6 @@ private:
     std::shared_ptr<sf::Clock> deltaClock;
     std::shared_ptr<sf::RenderWindow> win_;
     std::shared_ptr<Scene> scene_;
+    std::shared_ptr<GL> gl_;
 
 };
